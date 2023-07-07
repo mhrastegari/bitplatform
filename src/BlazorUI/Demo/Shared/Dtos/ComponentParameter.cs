@@ -1,4 +1,4 @@
-﻿namespace Bit.BlazorUI.Demo.Client.Core.Pages.Components.ComponentDemoBase;
+﻿namespace Bit.BlazorUI.Demo.Shared.Dtos;
 
 public class ComponentParameter
 {
