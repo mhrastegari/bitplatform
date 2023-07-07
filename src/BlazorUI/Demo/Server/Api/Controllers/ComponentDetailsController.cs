@@ -1,6 +1,10 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 using System.Xml.Linq;
 using Bit.BlazorUI.Demo.Server.Api.Controllers;
+using Bit.BlazorUI.Demo.Shared.Dtos;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Bit.BlazorUI.Demo.Api.Controllers;
 
@@ -40,26 +44,79 @@ public partial class ComponentDetailsController : AppControllerBase
 
         var componentNamePrefix = $"{componentType.FullName}.";
 
-        var baseComponentType = typeof(BitComponentBase);
-        var baseComponentNamePrefix = $"{baseComponentType.FullName}.";
+        var baseComponentNamePrefix = $"{typeof(BitComponentBase).FullName}.";
 
-        return Ok(componentType.GetProperties()
-                              .Where(p => Attribute.IsDefined(p, typeof(Microsoft.AspNetCore.Components.ParameterAttribute)))
-                              .Select(prop =>
-                              {
-                                  var xmlProperty = SummariesXmlDocument?.Descendants()
-                                                            .Attributes()
-                                                            .FirstOrDefault(a => a.Value.Contains(componentNamePrefix + prop.Name) || a.Value.Contains(baseComponentNamePrefix + prop.Name));
+        var parameters = componentType.GetProperties().Where(p => Attribute.IsDefined(p, typeof(Microsoft.AspNetCore.Components.ParameterAttribute)));
+        
+        var paramsDetails = parameters.Select(prop =>
+        {
+            var xmlProperty = SummariesXmlDocument?.Descendants()
+                                    .Attributes()
+                                    .FirstOrDefault(a => a.Value.Contains(componentNamePrefix + prop.Name) || a.Value.Contains(baseComponentNamePrefix + prop.Name));
 
-                                  var typeName = GetTypeName(prop.PropertyType);
-                                  return new
-                                  {
-                                      prop.Name,
-                                      Type = typeName,
-                                      DefaultValue = GetDefaulValue(prop, componentInstance, typeName, concreteComponentType),
-                                      Description = xmlProperty?.Parent.Element("summary")?.Value.Trim(),
-                                  };
-                              }));
+            var typeName = GetTypeName(prop.PropertyType);
+
+            var defaultValue = GetDefaulValue(prop, componentInstance, typeName, concreteComponentType);
+
+            if (prop.PropertyType.IsEnum)
+            {
+                defaultValue = $"{typeName}.{defaultValue}";
+            }
+
+            return new 
+            {
+                prop.Name,
+                Type = typeName,
+                DefaultValue = defaultValue,
+                Description = xmlProperty?.Parent.Element("summary")?.Value.Trim(),
+            };
+        });
+
+        var subEnumsTypes = parameters.Where(p => p.PropertyType.Namespace.StartsWith("Bit.BlazorUI") && p.PropertyType.IsEnum).Select(p => p.PropertyType);
+
+        var enumDetailsList = new List<ComponentSubEnum>();
+
+        foreach (var subEnumType in subEnumsTypes)
+        {
+            var enumProperties = subEnumType.GetFields(BindingFlags.Public | BindingFlags.Static);
+
+            var enumValues = enumProperties.Select(p => p.GetValue(null)).ToList();
+
+            var enumId = char.ToLower(subEnumType.Name[0]) + subEnumType.Name.Substring(1) + "-enum";
+
+            var componentSubEnum = new ComponentSubEnum
+            {
+                Id = enumId,
+                Name = subEnumType.Name,
+                Description = string.Empty,
+                Items = new List<ComponentEnumItem>()
+            };
+
+            foreach (var property in enumProperties)
+            {
+                var propertyName = property.Name;
+                var propertyValue = Convert.ToInt32(property.GetValue(null));
+
+                var xmlProperty = SummariesXmlDocument?.Descendants()
+                    .Attributes()
+                    .FirstOrDefault(a => a.Value.Contains(propertyName));
+
+                var description = xmlProperty?.Parent?.Element("summary")?.Value.Trim();
+
+                var enumItem = new ComponentEnumItem
+                {
+                    Name = propertyName,
+                    Description = description,
+                    Value = propertyValue.ToString()
+                };
+
+                componentSubEnum.Items.Add(enumItem);
+            }
+
+            enumDetailsList.Add(componentSubEnum);
+        }
+
+        return Ok(paramsDetails);
     }
 
     private static async Task<XDocument> LoadSummariesXmlDocumentAsync()
