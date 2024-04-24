@@ -23,7 +23,7 @@
         <ApplicationVersion>1</ApplicationVersion>
 
         <!-- Required for C# Hot Reload -->
-        <UseInterpreter Condition="'$(Configuration)' == 'Debug'">True</UseInterpreter>
+        <UseInterpreter>True</UseInterpreter>
 
         <NoWarn>$(NoWarn);ClassWithoutModifierAnalyzer</NoWarn>
     </PropertyGroup>
