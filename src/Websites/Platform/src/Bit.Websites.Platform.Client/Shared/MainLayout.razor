@@ -3,9 +3,14 @@
 <Header />
 
 <div class="main @(isDocsRoute ? null : "main--full-page")">
-    @if (isDocsRoute)
+    @if (isTemplateDocRoute)
     {
-        <NavMenu NavItems="navItems" />
+        <NavMenu NavItems="templatesNavItems" />
+    }
+
+    @if (isBswupDocRoute)
+    {
+        <NavMenu NavItems="bswupNavItems" />
     }
 
     <div class="site-content @(isDocsRoute ? "docs-content" : "")">

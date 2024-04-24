@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -142,17 +141,17 @@ public class BitSpinButtonTests : BunitTestContext
     }
 
     [DataTestMethod,
-        DataRow(BitLabelPosition.Start),
-        DataRow(BitLabelPosition.Top)
+        DataRow(BitSpinButtonLabelPosition.Left),
+        DataRow(BitSpinButtonLabelPosition.Top)
     ]
-    public void BitSpinButtonShouldHaveLabelPositionClassName(BitLabelPosition labelPosition)
+    public void BitSpinButtonShouldHaveLabelPositionClassName(BitSpinButtonLabelPosition labelPosition)
     {
         var component = RenderComponent<BitSpinButton>(parameters =>
         {
             parameters.Add(p => p.LabelPosition, labelPosition);
         });
 
-        var labelPositionClass = labelPosition == BitLabelPosition.Start ? "st" : "tp";
+        var labelPositionClass = labelPosition == BitSpinButtonLabelPosition.Left ? "lf" : "tp";
 
         var spinButton = component.Find(".bit-spb");
         Assert.IsTrue(spinButton.ClassList.Contains($"bit-spb-l{labelPositionClass}"));
@@ -265,7 +264,7 @@ public class BitSpinButtonTests : BunitTestContext
         DataRow(4),
         DataRow(12)
     ]
-    public async Task BitSpinButtonOnIncrementTest(int countOfClicks)
+    public void BitSpinButtonOnIncrementTest(int countOfClicks)
     {
         int onIncrementEventCounter = 0;
         var component = RenderComponent<BitSpinButton>(parameters =>
@@ -277,7 +276,6 @@ public class BitSpinButtonTests : BunitTestContext
         for (int i = 0; i < countOfClicks; i++)
         {
             increaseButton.PointerDown();
-            await Task.Delay(1);
             increaseButton.PointerUp();
         }
 
@@ -288,7 +286,7 @@ public class BitSpinButtonTests : BunitTestContext
        DataRow(4),
        DataRow(12)
     ]
-    public async Task BitSpinButtonOnDecrementTest(int countOfClicks)
+    public void BitSpinButtonOnDecrementTest(int countOfClicks)
     {
         int onDecrementEventCounter = 20;
         var component = RenderComponent<BitSpinButton>(parameters =>
@@ -300,7 +298,6 @@ public class BitSpinButtonTests : BunitTestContext
         for (int i = 0; i < countOfClicks; i++)
         {
             decreaseButton.PointerDown();
-            await Task.Delay(1);
             decreaseButton.PointerUp();
         }
 
@@ -636,7 +633,7 @@ public class BitSpinButtonTests : BunitTestContext
         DataRow(5, 2, 4),
         DataRow(1, 15, 1)
     ]
-    public async Task BitSpinButtonTwoWayBoundWithCustomHandlerShouldWorkCorrectly(double value, int countOfIncrements, double step)
+    public void BitSpinButtonTwoWayBoundWithCustomHandlerShouldWorkCorrectly(double value, int countOfIncrements, double step)
     {
         _bitSpinButtonTwoWayBoundValue = value;
 
@@ -651,7 +648,6 @@ public class BitSpinButtonTests : BunitTestContext
         for (var i = 0; i < countOfIncrements; i++)
         {
             incrementButton.PointerDown();
-            await Task.Delay(1);
         }
 
         var expectedValue = value + (step * countOfIncrements);

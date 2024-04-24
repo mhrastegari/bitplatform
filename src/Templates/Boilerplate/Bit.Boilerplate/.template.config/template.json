@@ -30,19 +30,6 @@
                 }
             ]
         },
-        "UserSecretsId": {
-            "type": "generated",
-            "generator": "guid",
-            "replaces": "AC87AA5B-4B37-4E52-8468-2D5DF24AF256",
-            "parameters": {
-                "defaultFormat": "D" //Guid format 
-            },
-            "onlyIf": [
-                {
-                    "after": "<UserSecretsId>"
-                }
-            ]
-        },
         "SeedDataProductCreatedOn": {
             "type": "generated",
             "generator": "now",
@@ -51,14 +38,8 @@
                 "format": "yyyy-MM-dd"
             }
         },
-        "api": {
-            "displayName": "Add API to Server project?",
-            "type": "parameter",
-            "datatype": "bool",
-            "defaultValue": "true"
-        },
         "database": {
-            "displayName": "Backend database",
+            "displayName": "Database",
             "type": "parameter",
             "datatype": "choice",
             "defaultValue": "SqlServer",
@@ -77,24 +58,8 @@
                 }
             ]
         },
-        "captcha": {
-            "displayName": "Captcha",
-            "type": "parameter",
-            "datatype": "choice",
-            "defaultValue": "reCaptcha",
-            "choices": [
-                {
-                    "choice": "reCaptcha",
-                    "description": "Google reCaptcha"
-                },
-                {
-                    "choice": "None",
-                    "description": "None"
-                }
-            ]
-        },
         "pipeline": {
-            "displayName": "CI-CD pipeline",
+            "displayName": "CI-CD Pipeline",
             "type": "parameter",
             "datatype": "choice",
             "defaultValue": "GitHub",
@@ -108,8 +73,8 @@
                     "description": "Azure DevOps pipelines"
                 },
                 {
-                    "choice": "None",
-                    "description": "None"
+                    "choice": "Other",
+                    "description": "Other"
                 }
             ]
         },
@@ -134,67 +99,19 @@
             ]
         },
         "offlineDb": {
-            "displayName": "Add Offline db?",
+            "displayName": "Offline db",
             "type": "parameter",
             "datatype": "bool",
             "defaultValue": "false"
         },
         "windows": {
-            "displayName": "Add Windows project?",
+            "displayName": "Windows",
             "type": "parameter",
             "datatype": "bool",
             "defaultValue": "false"
-        },
-        "appInsights": {
-            "displayName": "Add Azure application insights to project?",
-            "type": "parameter",
-            "datatype": "bool",
-            "defaultValue": "false"
-        },
-        "nameToLower": {
-            "type": "generated",
-            "generator": "casing",
-            "parameters": {
-                "source": "name",
-                "toLower": true
-            }
-        },
-        "nameToAppId": {
-            "type": "generated",
-            "generator": "regex",
-            "dataType": "string",
-            "parameters": {
-                "source": "nameToLower",
-                "steps": [
-                    {
-                        "regex": "[^a-z0-9_\\.]",
-                        "replacement": ""
-                    }
-                ]
-            }
-        },
-        "defaultAppId": {
-            "type": "generated",
-            "generator": "join",
-            "parameters": {
-                "symbols": [
-                    {
-                        "type": "const",
-                        "value": "com.companyname."
-                    },
-                    {
-                        "type": "ref",
-                        "value": "nameToAppId"
-                    }
-                ]
-            },
-            "replaces": "com.bitplatform.template"
         }
     },
     "postActions": [],
-    "primaryOutputs": [
-        { "path": "Boilerplate.sln" }
-    ],
     "sources": [
         {
             "modifiers": [
@@ -202,6 +119,7 @@
                     "copyOnly": [
                         "global.json",
                         "**.Web/Pages/Home.razor",
+                        "**/*.scss",
                         "**/*.svg",
                         "**/*.png"
                     ],
@@ -221,22 +139,18 @@
                 },
                 {
                     "condition": "(pipeline != GitHub)",
-                    "exclude": [
-                        ".github/**"
-                    ]
+                    "exclude": [ ".github/**" ]
                 },
                 {
                     "condition": "(pipeline != Azure)",
-                    "exclude": [
-                        ".azure-devops/**"
-                    ]
+                    "exclude": [ ".azure-devops/**" ]
                 },
                 {
                     "condition": "(sample != Admin)",
                     "exclude": [
-                        "src/Boilerplate.Shared/Dtos/Categories/**",
-                        "src/Boilerplate.Shared/Dtos/Dashboard/**",
-                        "src/Boilerplate.Shared/Dtos/Products/**",
+                        "src/Shared/Dtos/Categories/**",
+                        "src/Shared/Dtos/Dashboard/**",
+                        "src/Shared/Dtos/Products/**",
                         "src/Boilerplate.Server/Controllers/Categories/**",
                         "src/Boilerplate.Server/Controllers/Products/**",
                         "src/Boilerplate.Server/Controllers/Dashboard/**",
@@ -257,7 +171,7 @@
                 {
                     "condition": "(sample != Todo)",
                     "exclude": [
-                        "src/Boilerplate.Shared/Dtos/Todo/**",
+                        "src/Shared/Dtos/Todo/**",
                         "src/Boilerplate.Server/Controllers/Todo/**",
                         "src/Boilerplate.Server/Mappers/TodoMapper.cs",
                         "src/Boilerplate.Server/Models/Todo/**",
@@ -276,45 +190,6 @@
                     "condition": "(windows != true)",
                     "exclude": [
                         "src/Client/Boilerplate.Client.Windows/**"
-                    ]
-                },
-                {
-                    "condition": "(api != true)",
-                    "exclude": [
-                        "src/Boilerplate.Server/.config/**",
-                        "src/Boilerplate.Server/Components/*Template.razor",
-                        "src/Boilerplate.Server/Controllers/**",
-                        "src/Boilerplate.Server/Data/**",
-                        "src/Boilerplate.Server/Mappers/**",
-                        "src/Boilerplate.Server/Models/**",
-                        "src/Boilerplate.Server/Resources/**",
-                        "src/Boilerplate.Server/Services/ODataOperationFilter.cs",
-                        "src/Boilerplate.Server/Services/AppIdentityErrorDescriber.cs",
-                        "src/Boilerplate.Server/Services/AppSecureJwtDataFormat.cs",
-                        "src/Boilerplate.Server/wwwroot/swagger/**",
-                        "src/Boilerplate.Server/AppSettings.cs",
-                        "src/Boilerplate.Server/Services/ServerJsonContext.cs",
-                        "src/Boilerplate.Server/IdentityCertificate.pfx"
-                    ]
-                },
-                {
-                    "condition": "(api != true || captcha != reCaptcha)",
-                    "exclude": [
-                        "src/Boilerplate.Server/Services/GoogleRecaptchaHttpClient.cs",
-                        "src/Boilerplate.Server/Services/GoogleRecaptchaVerificationResponse.cs"
-                    ]
-                },
-                {
-                    "condition": "(captcha != reCaptcha)",
-                    "exclude": [
-                        "src/Boilerplate.Client.Core/Components/Pages/Identity/GoogleRecaptcha.razor"
-                    ]
-                },
-                {
-                    "condition": "(appInsights != true)",
-                    "exclude": [
-                        "src/Client/Boilerplate.Client.Maui/Services/MauiTelemetryInitializer.cs",
-                        "src/Client/Boilerplate.Client.Windows/Services/WindowsTelemetryInitializer.cs"
                     ]
                 }
             ]

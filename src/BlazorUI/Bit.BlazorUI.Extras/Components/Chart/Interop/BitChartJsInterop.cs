@@ -10,6 +10,8 @@ namespace Bit.BlazorUI;
 /// </summary>
 internal static class BitChartJsInterop
 {
+    private const string BitChartJsInteropName = "BitChartJsInterop";
+
     internal static JsonSerializerSettings JsonSerializerSettings { get; } = new JsonSerializerSettings
     {
         NullValueHandling = NullValueHandling.Ignore,
@@ -17,17 +19,15 @@ internal static class BitChartJsInterop
         {
             NamingStrategy = new CamelCaseNamingStrategy(true, false)
         },
-        Converters = { new IsoDateTimeConverter() }
+        Converters =
+        {
+            new IsoDateTimeConverter()
+        }
     };
 
-    public static ValueTask InitChartJs(this IJSRuntime jsRuntime, IEnumerable<string> scripts)
+    public static async Task InitChartJs(this IJSRuntime jsRuntime, IEnumerable<string> scripts)
     {
-        return jsRuntime.InvokeVoidAsync("BitBlazorUI.BitChart.initChartJs", scripts);
-    }
-
-    public static ValueTask RemoveChart(this IJSRuntime jsRuntime, string canvasId)
-    {
-        return jsRuntime.InvokeVoidAsync("BitBlazorUI.BitChart.removeChart", canvasId);
+        await jsRuntime.InvokeVoidAsync($"{BitChartJsInteropName}.initChartJs", scripts);
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ internal static class BitChartJsInterop
     {
         dynamic dynParam = StripNulls(chartConfig);
         Dictionary<string, object> param = ConvertExpandoObjectToDictionary(dynParam);
-        return jsRuntime.InvokeAsync<bool>("BitBlazorUI.BitChart.setupChart", param);
+        return jsRuntime.InvokeAsync<bool>($"{BitChartJsInteropName}.setupChart", param);
     }
 
     /// <summary>
@@ -95,7 +95,7 @@ internal static class BitChartJsInterop
     {
         dynamic dynParam = StripNulls(chartConfig);
         Dictionary<string, object> param = ConvertExpandoObjectToDictionary(dynParam);
-        return jsRuntime.InvokeAsync<bool>("BitBlazorUI.BitChart.updateChart", param);
+        return jsRuntime.InvokeAsync<bool>($"{BitChartJsInteropName}.updateChart", param);
     }
 
     /// <summary>

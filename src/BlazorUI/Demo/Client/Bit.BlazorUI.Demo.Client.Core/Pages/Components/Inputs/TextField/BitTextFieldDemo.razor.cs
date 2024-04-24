@@ -2,8 +2,8 @@
 
 public partial class BitTextFieldDemo
 {
-    private readonly List<ComponentParameter> componentParameters =
-    [
+    private readonly List<ComponentParameter> componentParameters = new()
+    {
         new()
         {
             Name = "AutoComplete",
@@ -241,10 +241,10 @@ public partial class BitTextFieldDemo
             LinkType = LinkType.Link,
             Href = "#text-field-type-enum"
         }
-    ];
+    };
 
-    private readonly List<ComponentSubClass> componentSubClasses =
-    [
+    private readonly List<ComponentSubClass> componentSubClasses = new()
+    {
         new()
         {
             Id = "textfield-class-styles",
@@ -366,10 +366,10 @@ public partial class BitTextFieldDemo
                 }
             }
         }
-    ];
+    };
 
-    private readonly List<ComponentSubEnum> componentSubEnums =
-    [
+    private readonly List<ComponentSubEnum> componentSubEnums = new()
+    {
         new()
         {
             Id = "text-field-type-enum",
@@ -415,23 +415,8 @@ public partial class BitTextFieldDemo
                 }
             }
         }
-    ];
+    };
 
-    private readonly List<ComponentParameter> componentPublicMembers =
-    [
-        new()
-        {
-            Name = "InputElement",
-            Type = "ElementReference",
-            Description = "The ElementReference to the input element of the BitTextField.",
-        },
-        new()
-        {
-            Name = "FocusAsync",
-            Type = "ValueTask",
-            Description = "Gives focus to the input element of the BitTextField.",
-        }
-    ];
 
 
     private string? oneWayValue;
@@ -655,14 +640,4 @@ private ValidationTextFieldModel validationTextFieldModel = new();
 
 private void HandleValidSubmit() { }
 private void HandleInvalidSubmit() { }";
-
-    private readonly string example13RazorCode = @"
-<BitTextField Dir=""BitDir.Rtl""
-              Placeholder=""پست الکترونیکی""
-              IconName=""@BitIconName.EditMail"" />
-
-<BitTextField IsUnderlined 
-              Dir=""BitDir.Rtl""
-              Label=""تقویم"" 
-              IconName=""@BitIconName.Calendar"" />";
 }

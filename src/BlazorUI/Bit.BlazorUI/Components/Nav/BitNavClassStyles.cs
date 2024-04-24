@@ -41,9 +41,4 @@ public class BitNavClassStyles
     /// Custom CSS classes/styles for the toggle button of the BitNav.
     /// </summary>
     public string? ToggleButton { get; set; }
-
-    /// <summary>
-    /// Custom CSS classes/styles for the separator of the BitNav.
-    /// </summary>
-    public string? Separator { get; set; }
 }

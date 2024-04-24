@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.Extensions.DependencyInjection;
 
-public static partial class IServiceCollectionExtensions
+public static class IMacServiceCollectionExtensions
 {
-    public static IServiceCollection AddClientMauiProjectMacCatalystServices(this IServiceCollection services)
+    public static IServiceCollection AddClientMacServices(this IServiceCollection services)
     {
-        // Services being registered here can get injected in Maui/macOS.
+        // Services registered in this class can be injected in macOS.
 
         return services;
     }

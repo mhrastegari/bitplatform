@@ -1,12 +1,11 @@
-﻿//+:cnd:noEmit
+﻿using Boilerplate.Client.Core.Controllers.Identity;
 using Boilerplate.Shared.Dtos.Identity;
-using Boilerplate.Client.Core.Controllers.Identity;
 
 namespace Boilerplate.Client.Core.Components.Pages.Identity;
 
 public partial class SignUpPage
 {
-    [AutoInject] private IIdentityController identityController = default!;
+    [AutoInject] IIdentityController identityController = default!;
 
     private bool isLoading;
     private bool isSignedUp;
@@ -17,18 +16,6 @@ public partial class SignUpPage
     private async Task DoSignUp()
     {
         if (isLoading) return;
-
-        //#if (captcha == "reCaptcha")
-        var googleRecaptchaResponse = await JSRuntime.GoogleRecaptchaGetResponse();
-        if (string.IsNullOrWhiteSpace(googleRecaptchaResponse))
-        {
-            signUpMessageType = BitMessageBarType.Error;
-            signUpMessage = Localizer[nameof(AppStrings.InvalidGoogleRecaptchaChallenge)];
-            return;
-        }
-
-        signUpModel.GoogleRecaptchaResponse = googleRecaptchaResponse;
-        //#endif
 
         isLoading = true;
         signUpMessage = null;
@@ -51,9 +38,6 @@ public partial class SignUpPage
         }
         finally
         {
-            //#if (captcha == "reCaptcha")
-            await JSRuntime.GoogleRecaptchaReset();
-            //#endif
             isLoading = false;
         }
     }
@@ -67,9 +51,7 @@ public partial class SignUpPage
 
         try
         {
-            var sendConfirmationEmailRequest = new SendConfirmationEmailRequestDto { Email = signUpModel.Email };
-
-            await identityController.SendConfirmationEmail(sendConfirmationEmailRequest, CurrentCancellationToken);
+            await identityController.SendConfirmationEmail(new() { Email = signUpModel.Email }, CurrentCancellationToken);
 
             signUpMessageType = BitMessageBarType.Success;
             signUpMessage = Localizer[nameof(AppStrings.ResendConfirmationLinkMessage)];

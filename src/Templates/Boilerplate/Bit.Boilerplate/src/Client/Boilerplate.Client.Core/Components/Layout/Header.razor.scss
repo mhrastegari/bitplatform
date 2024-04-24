@@ -1,17 +1,19 @@
-﻿@import '../../Styles/abstracts/_vars.scss';
-@import '../../Styles/abstracts/_functions.scss';
+﻿@import '../../Styles/abstracts/_functions.scss';
 @import '../../Styles/abstracts/_media-queries.scss';
 @import '../../Styles/abstracts/_bit-css-variables.scss';
 
 .header {
     top: 0;
     width: 100%;
+    z-index: 100;
     display: flex;
+    position: fixed;
     align-items: center;
     flex-flow: row nowrap;
     min-height: rem2(48px);
+    padding-left: rem2(16px);
+    padding-right: rem2(16px);
     padding-bottom: rem2(7px);
-    padding-inline: rem2(16px);
     justify-content: space-between;
     box-shadow: $bit-box-shadow-callout;
     background-color: $bit-color-background-primary;
@@ -46,7 +48,7 @@
 ::deep {
     .header-menu {
         display: none;
-        margin-inline-end: rem2(12px);
+        margin-right: rem2(12px);
 
         @include lt-lg {
             display: block;

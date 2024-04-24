@@ -4,22 +4,15 @@ namespace Bit.Websites.Platform.Client.Shared;
 
 public partial class Header : IDisposable
 {
-    private bool isDocsRoute;
-    private bool isBswupDocRoute;
-    private bool isBesqlDocRoute;
-    private bool isButilDocRoute;
-    private bool isHeaderMenuOpen;
-    private bool isTemplateDocRoute;
     private string currentUrl = string.Empty;
-
+    private bool isHeaderMenuOpen;
 
     [AutoInject] public NavManuService navManuService = default!;
     [AutoInject] public BitThemeManager bitThemeManager  = default!;
 
     protected override async Task OnInitAsync()
     {
-        HandleCollapseMenu();
-
+        currentUrl = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "/", StringComparison.Ordinal);
         NavigationManager.LocationChanged += OnLocationChanged;
 
         await base.OnInitAsync();
@@ -27,21 +20,8 @@ public partial class Header : IDisposable
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
     {
-        HandleCollapseMenu();
-
-        StateHasChanged();
-    }
-
-    private void HandleCollapseMenu()
-    {
         currentUrl = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "/", StringComparison.Ordinal);
-
-        isBswupDocRoute = currentUrl.Contains("bswup");
-        isBesqlDocRoute = currentUrl.Contains("besql");
-        isButilDocRoute = currentUrl.Contains("butil");
-        isTemplateDocRoute = currentUrl.Contains("templates") || currentUrl.Contains("admin-panel") || currentUrl.Contains("todo-template");
-
-        isDocsRoute = isTemplateDocRoute || isBswupDocRoute || isBesqlDocRoute || isButilDocRoute;
+        StateHasChanged();
     }
 
     private void ToggleMenu()
@@ -58,7 +38,7 @@ public partial class Header : IDisposable
         else return currentUrl switch
         {
             Urls.HomePage => "Home",
-            Urls.BlazorUI => "Products & Services",
+            Urls.Components => "Products & Services",
             Urls.CloudHostingSolutions => "Products & Services",
             Urls.Support => "Products & Services",
             Urls.Academy => "Products & Services",
@@ -74,7 +54,7 @@ public partial class Header : IDisposable
     private bool IsProductsServicesActive()
     {
         return (currentUrl.Contains("templates") ||
-           currentUrl == Urls.BlazorUI ||
+           currentUrl == Urls.Components ||
            currentUrl == Urls.CloudHostingSolutions ||
            currentUrl == Urls.Support ||
            currentUrl == Urls.Academy);

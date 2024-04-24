@@ -1,15 +1,16 @@
-﻿namespace Boilerplate.Client.Windows.Services;
+﻿using Boilerplate.Client.Core.Services;
 
-/// <summary>
-/// Instead of Client.Core, install AppCenter, Firebase etc in Client.Windows, so the web version of the app won't download unnecessary packages.
-/// You can call their APIs such as Crashes.TrackError in WindowsExceptionHandler to monitor all exceptions across Android, iOS, Windows, and macOS.
-/// Employing Microsoft.Extensions.Logging implementations (like Sentry.Extensions.Logging) will result in
-/// automatic exception logging due to the logger.LogError method call within the ExceptionHandlerBase class.
-/// </summary>
+namespace Boilerplate.Client.Windows.Services;
+
 public partial class WindowsExceptionHandler : ExceptionHandlerBase
 {
-    protected override void Handle(Exception exception, Dictionary<string, object> parameters)
+    public override void Handle(Exception exception, IDictionary<string, object?>? parameters = null)
     {
+        if (exception is TaskCanceledException)
+        {
+            return;
+        }
+
         base.Handle(exception, parameters);
     }
 }

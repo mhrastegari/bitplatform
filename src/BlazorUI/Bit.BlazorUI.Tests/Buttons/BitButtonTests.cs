@@ -315,20 +315,20 @@ public class BitButtonTests : BunitTestContext
         DataRow(BitLabelPosition.Top),
         DataRow(BitLabelPosition.Top),
 
-        DataRow(BitLabelPosition.End),
-        DataRow(BitLabelPosition.End),
-        DataRow(BitLabelPosition.End),
-        DataRow(BitLabelPosition.End),
+        DataRow(BitLabelPosition.Right),
+        DataRow(BitLabelPosition.Right),
+        DataRow(BitLabelPosition.Right),
+        DataRow(BitLabelPosition.Right),
 
         DataRow(BitLabelPosition.Bottom),
         DataRow(BitLabelPosition.Bottom),
         DataRow(BitLabelPosition.Bottom),
         DataRow(BitLabelPosition.Bottom),
 
-        DataRow(BitLabelPosition.Start),
-        DataRow(BitLabelPosition.Start),
-        DataRow(BitLabelPosition.Start),
-        DataRow(BitLabelPosition.Start),
+        DataRow(BitLabelPosition.Left),
+        DataRow(BitLabelPosition.Left),
+        DataRow(BitLabelPosition.Left),
+        DataRow(BitLabelPosition.Left),
 
         DataRow(null),
     ]
@@ -351,10 +351,10 @@ public class BitButtonTests : BunitTestContext
         var labelPositionClass = labelPosition switch
         {
             BitLabelPosition.Top => "bit-btn-top",
-            BitLabelPosition.End => "bit-btn-end",
+            BitLabelPosition.Right => "bit-btn-rgt",
             BitLabelPosition.Bottom => "bit-btn-btm",
-            BitLabelPosition.Start => "bit-btn-srt",
-            _ => "bit-btn-end"
+            BitLabelPosition.Left => "bit-btn-lft",
+            _ => "bit-btn-rgt"
         };
 
         Assert.AreEqual(loadingLabel, bitButton.LastElementChild.TextContent);

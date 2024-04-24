@@ -2,7 +2,6 @@
 using System.Text.Json;
 using Boilerplate.Shared.Dtos.Identity;
 using Boilerplate.Client.Core.Controllers.Identity;
-using Microsoft.Extensions.Logging;
 
 namespace Boilerplate.Client.Core.Services;
 
@@ -14,15 +13,14 @@ public partial class AuthenticationManager : AuthenticationStateProvider
     [AutoInject] private IIdentityController identityController = default;
     [AutoInject] private IStringLocalizer<AppStrings> localizer = default!;
     [AutoInject] private JsonSerializerOptions jsonSerializerOptions = default!;
+
     public async Task SignIn(SignInRequestDto signInModel, CancellationToken cancellationToken)
     {
         var result = await identityController.SignIn(signInModel, cancellationToken);
 
         await StoreToken(result!, signInModel.RememberMe);
 
-        var state = await GetAuthenticationStateAsync();
-
-        NotifyAuthenticationStateChanged(Task.FromResult(state));
+        NotifyAuthenticationStateChanged(Task.FromResult(await GetAuthenticationStateAsync()));
     }
 
     public async Task SignOut()
@@ -94,13 +92,11 @@ public partial class AuthenticationManager : AuthenticationStateProvider
         await storageService.SetItem("refresh_token", tokenResponseDto!.RefreshToken, rememberMe is true);
         if (AppRenderMode.PrerenderEnabled && AppRenderMode.IsBlazorHybrid is false)
         {
-            await cookie.Set(new()
+            await cookie.Set(new ButilCookie
             {
                 Name = "access_token",
                 Value = tokenResponseDto.AccessToken,
-                MaxAge = tokenResponseDto.ExpiresIn,
-                SameSite = SameSite.Strict,
-                Secure = BuildConfiguration.IsRelease()
+                MaxAge = tokenResponseDto.ExpiresIn
             });
         }
     }

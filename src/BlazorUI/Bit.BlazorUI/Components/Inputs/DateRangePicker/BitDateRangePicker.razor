@@ -4,8 +4,7 @@
 <div @ref="RootElement" @attributes="HtmlAttributes"
      id="@_Id"
      style="@StyleBuilder.Value"
-     class="@ClassBuilder.Value"
-     dir="@Dir?.ToString().ToLower()">
+     class="@ClassBuilder.Value">
 
     @if (LabelTemplate is not null)
     {
@@ -21,8 +20,7 @@
     }
     <div style="@Styles?.InputWrapper" class="bit-dtrp-wrp @Classes?.InputWrapper" id="@_dateRangePickerId" aria-owns="@(IsOpen ? _calloutId : null)" @onclick="HandleOnClick">
         <div style="@Styles?.InputContainer" class="bit-dtrp-icn @Classes?.InputContainer">
-            <input @ref="_inputRef"
-                   @attributes="InputHtmlAttributes"
+            <input @attributes="InputHtmlAttributes"
                    @onfocus="@HandleOnFocus"
                    @onchange="@HandleOnChange"
                    @onfocusin="@HandleOnFocusIn"
@@ -42,18 +40,6 @@
                    aria-labelledby="@(Label.HasValue() ? _labelId : null)"
                    style="@Styles?.Input"
                    class="bit-dtrp-inp@(AllowTextInput ? " bit-dtrp-ein" : null) @Classes?.Input" />
-
-            @if (IsEnabled && ShowClearButton && CurrentValue?.StartDate is not null)
-            {
-                <button @onclick="HandleOnClearButtonClick" @onclick:stopPropagation
-                        style="@Styles?.ClearButton"
-                        class="bit-dtrp-clr @Classes?.ClearButton"
-                        type="button"
-                        aria-hidden="true"
-                        aria-label="Clear date">
-                    <i style="@Styles?.ClearButtonIcon" class="bit-icon bit-icon--Cancel @Classes?.ClearButtonIcon" aria-hidden="true" />
-                </button>
-            }
 
             @if (IconTemplate is not null)
             {
@@ -474,16 +460,6 @@
                         <div style="@Styles?.Divider" class="bit-dtrp-dvd @Classes?.Divider"></div>
                     }
 
-                    var startTimeIncreaseHourDisabled = IsIncreaseOrDecreaseButtonDisabled(true, true, true);
-                    var startTimeDecreaseHourDisabled = IsIncreaseOrDecreaseButtonDisabled(false, true, true);
-                    var startTimeIncreaseMinuteDisabled = IsIncreaseOrDecreaseButtonDisabled(true, false, true);
-                    var startTimeDecreaseMinuteDisabled = IsIncreaseOrDecreaseButtonDisabled(false, false, true);
-
-                    var endTimeIncreaseHourDisabled = IsIncreaseOrDecreaseButtonDisabled(true, true, false);
-                    var endTimeDecreaseHourDisabled = IsIncreaseOrDecreaseButtonDisabled(false, true, false);
-                    var endTimeIncreaseMinuteDisabled = IsIncreaseOrDecreaseButtonDisabled(true, false, false);
-                    var endTimeDecreaseMinuteDisabled = IsIncreaseOrDecreaseButtonDisabled(false, false, false);
-
                     <div style="@Styles?.TimePickerWrapper" class="bit-dtrp-twp @Classes?.TimePickerWrapper">
                         <div style="@Styles?.TimePickerHeader" class="bit-dtrp-pkh bit-dtrp-tph @Classes?.TimePickerHeader">
                             <div style="@Styles?.TimePickerNavWrapper" class="bit-dtrp-nbc @Classes?.TimePickerNavWrapper">
@@ -507,9 +483,7 @@
                                             @onpointerdown="() => HandleOnPointerDown(true, true, true)"
                                             type="button"
                                             style="@Styles?.StartTimeIncreaseHourButton"
-                                            class="bit-dtrp-tbt @Classes?.StartTimeIncreaseHourButton"
-                                            disabled="@startTimeIncreaseHourDisabled"
-                                            aria-disabled="@startTimeIncreaseHourDisabled">
+                                            class="bit-dtrp-tbt @Classes?.StartTimeIncreaseHourButton">
                                         <i style="@Styles?.StartTimeIncreaseHourIcon" class="bit-icon bit-icon--ChevronUpSmall @Classes?.StartTimeIncreaseHourIcon" aria-hidden="true" />
                                     </button>
                                     <input @ref="_startTimeHourInputRef"
@@ -528,9 +502,7 @@
                                             @onpointerdown="() => HandleOnPointerDown(false, true, true)"
                                             type="button"
                                             style="@Styles?.StartTimeDecreaseHourButton"
-                                            class="bit-dtrp-tbt @Classes?.StartTimeDecreaseHourButton"
-                                            disabled="@startTimeDecreaseHourDisabled"
-                                            aria-disabled="@startTimeDecreaseHourDisabled">
+                                            class="bit-dtrp-tbt @Classes?.StartTimeDecreaseHourButton">
                                         <i style="@Styles?.StartTimeDecreaseHourIcon" class="bit-icon bit-icon--ChevronDownSmall @Classes?.StartTimeDecreaseHourIcon" aria-hidden="true" />
                                     </button>
                                 </div>
@@ -541,9 +513,7 @@
                                             @onpointerdown="() => HandleOnPointerDown(true, false, true)"
                                             type="button"
                                             style="@Styles?.StartTimeIncreaseMinuteButton"
-                                            class="bit-dtrp-tbt @Classes?.StartTimeIncreaseMinuteButton"
-                                            disabled="@startTimeIncreaseMinuteDisabled"
-                                            aria-disabled="@startTimeIncreaseMinuteDisabled">
+                                            class="bit-dtrp-tbt @Classes?.StartTimeIncreaseMinuteButton">
                                         <i style="@Styles?.StartTimeIncreaseMinuteIcon" class="bit-icon bit-icon--ChevronUpSmall @Classes?.StartTimeIncreaseMinuteIcon" aria-hidden="true" />
                                     </button>
                                     <input @ref="_startTimeMinuteInputRef"
@@ -562,9 +532,7 @@
                                             @onpointerdown="() => HandleOnPointerDown(false, false, true)"
                                             type="button"
                                             style="@Styles?.StartTimeDecreaseMinuteButton"
-                                            class="bit-dtrp-tbt @Classes?.StartTimeDecreaseMinuteButton"
-                                            disabled="@startTimeDecreaseMinuteDisabled"
-                                            aria-disabled="@startTimeDecreaseMinuteDisabled">
+                                            class="bit-dtrp-tbt @Classes?.StartTimeDecreaseMinuteButton">
                                         <i style="@Styles?.StartTimeDecreaseMinuteIcon" class="bit-icon bit-icon--ChevronDownSmall @Classes?.StartTimeDecreaseMinuteIcon" aria-hidden="true" />
                                     </button>
                                 </div>
@@ -575,16 +543,14 @@
                                         <button @onclick="() => HandleOnAmClick(true)"
                                                 type="button"
                                                 style="@Styles?.StartTimeAmButton"
-                                                class="bit-dtrp-tbt bit-dtrp-bam @(IsAm(_startTimeHour) is true ? "bit-dtrp-bns" : string.Empty) @Classes?.StartTimeAmButton"
-                                                disabled="@(IsAm(_startTimeHour) is true || IsAmPmButtonDisabled(true, true))">
+                                                class="bit-dtrp-tbt bit-dtrp-bam @(IsAm(_startTimeHour) is true ? "bit-dtrp-bns" : string.Empty) @Classes?.StartTimeAmButton">
                                             @Culture.DateTimeFormat.AMDesignator
                                         </button>
 
                                         <button @onclick="() => HandleOnPmClick(true)"
                                                 type="button"
                                                 style="@Styles?.StartTimePmButton"
-                                                class="bit-dtrp-tbt bit-dtrp-bpm @(IsAm(_startTimeHour) is false ? "bit-dtrp-bns" : string.Empty) @Classes?.StartTimePmButton"
-                                                disabled="@(IsAm(_startTimeHour) is false || IsAmPmButtonDisabled(false, true))">
+                                                class="bit-dtrp-tbt bit-dtrp-bpm @(IsAm(_startTimeHour) is false ? "bit-dtrp-bns" : string.Empty) @Classes?.StartTimePmButton">
                                             @Culture.DateTimeFormat.PMDesignator
                                         </button>
                                     </div>
@@ -598,9 +564,7 @@
                                             @onpointerdown="() => HandleOnPointerDown(true, true, false)"
                                             type="button"
                                             style="@Styles?.EndTimeIncreaseHourButton"
-                                            class="bit-dtrp-tbt @Classes?.EndTimeIncreaseHourButton"
-                                            disabled="@endTimeIncreaseHourDisabled"
-                                            aria-disabled="@endTimeIncreaseHourDisabled">
+                                            class="bit-dtrp-tbt @Classes?.EndTimeIncreaseHourButton">
                                         <i style="@Styles?.EndTimeIncreaseHourIcon" class="bit-icon bit-icon--ChevronUpSmall @Classes?.EndTimeIncreaseHourIcon" aria-hidden="true" />
                                     </button>
                                     <input @ref="_endTimeHourInputRef"
@@ -619,9 +583,7 @@
                                             @onpointerdown="() => HandleOnPointerDown(false, true, false)"
                                             type="button"
                                             style="@Styles?.EndTimeDecreaseHourButton"
-                                            class="bit-dtrp-tbt @Classes?.EndTimeDecreaseHourButton"
-                                            disabled="@endTimeDecreaseHourDisabled"
-                                            aria-disabled="@endTimeDecreaseHourDisabled">
+                                            class="bit-dtrp-tbt @Classes?.EndTimeDecreaseHourButton">
                                         <i style="@Styles?.EndTimeDecreaseHourIcon" class="bit-icon bit-icon--ChevronDownSmall @Classes?.EndTimeDecreaseHourIcon" aria-hidden="true" />
                                     </button>
                                 </div>
@@ -632,9 +594,7 @@
                                             @onpointerdown="() => HandleOnPointerDown(true, false, false)"
                                             type="button"
                                             style="@Styles?.EndTimeIncreaseMinuteButton"
-                                            class="bit-dtrp-tbt @Classes?.EndTimeIncreaseMinuteButton"
-                                            disabled="@endTimeIncreaseMinuteDisabled"
-                                            aria-disabled="@endTimeIncreaseMinuteDisabled">
+                                            class="bit-dtrp-tbt @Classes?.EndTimeIncreaseMinuteButton">
                                         <i style="@Styles?.EndTimeIncreaseMinuteIcon" class="bit-icon bit-icon--ChevronUpSmall @Classes?.EndTimeIncreaseMinuteIcon" aria-hidden="true" />
                                     </button>
                                     <input @ref="_endTimeMinuteInputRef"
@@ -653,9 +613,7 @@
                                             @onpointerdown="() => HandleOnPointerDown(false, false, false)"
                                             type="button"
                                             style="@Styles?.EndTimeDecreaseMinuteButton"
-                                            class="bit-dtrp-tbt @Classes?.EndTimeDecreaseMinuteButton"
-                                            disabled="@endTimeDecreaseMinuteDisabled"
-                                            aria-disabled="@endTimeDecreaseMinuteDisabled">
+                                            class="bit-dtrp-tbt @Classes?.EndTimeDecreaseMinuteButton">
                                         <i style="@Styles?.EndTimeDecreaseMinuteIcon" class="bit-icon bit-icon--ChevronDownSmall @Classes?.EndTimeDecreaseMinuteIcon" aria-hidden="true" />
                                     </button>
                                 </div>
@@ -666,16 +624,14 @@
                                         <button @onclick="() => HandleOnAmClick(false)"
                                                 type="button"
                                                 style="@Styles?.EndTimeAmButton"
-                                                class="bit-dtrp-tbt bit-dtrp-bam @(IsAm(_endTimeHour) is true ? "bit-dtrp-bns" : string.Empty) @Classes?.EndTimeAmButton"
-                                                disabled="@(IsAm(_endTimeHour) is false || IsAmPmButtonDisabled(true, false))">
+                                                class="bit-dtrp-tbt bit-dtrp-bam @(IsAm(_endTimeHour) is true ? "bit-dtrp-bns" : string.Empty) @Classes?.EndTimeAmButton">
                                             @Culture.DateTimeFormat.AMDesignator
                                         </button>
 
                                         <button @onclick="() => HandleOnPmClick(false)"
                                                 type="button"
                                                 style="@Styles?.EndTimePmButton"
-                                                class="bit-dtrp-tbt bit-dtrp-bpm @(IsAm(_endTimeHour) is false ? "bit-dtrp-bns" : string.Empty) @Classes?.EndTimePmButton"
-                                                disabled="@(IsAm(_endTimeHour) is false || IsAmPmButtonDisabled(false, false))">
+                                                class="bit-dtrp-tbt bit-dtrp-bpm @(IsAm(_endTimeHour) is false ? "bit-dtrp-bns" : string.Empty) @Classes?.EndTimePmButton">
                                             @Culture.DateTimeFormat.PMDesignator
                                         </button>
                                     </div>

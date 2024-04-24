@@ -1,4 +1,4 @@
-﻿//+:cnd:noEmit
+﻿
 namespace Boilerplate.Shared.Dtos.Identity;
 
 [DtoResourceType(typeof(AppStrings))]
@@ -15,7 +15,7 @@ public class SignInRequestDto
     [Display(Name = nameof(AppStrings.Password))]
     public string? Password { get; set; }
 
-    [JsonIgnore]
+    [NotMapped]
     [Display(Name = nameof(AppStrings.RememberMe))]
     public bool RememberMe { get; set; } = true;
 }

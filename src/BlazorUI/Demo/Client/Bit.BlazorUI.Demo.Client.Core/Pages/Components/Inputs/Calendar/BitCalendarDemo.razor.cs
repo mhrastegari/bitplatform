@@ -253,20 +253,6 @@ public partial class BitCalendarDemo
             Type = "string",
             DefaultValue = "{0} - {1}, change month",
             Description = "The title of the year range picker's toggle (tooltip)."
-        },
-        new()
-        {
-            Name = "HourStep",
-            Type = "int",
-            DefaultValue = "1",
-            Description = "Determines increment/decrement steps for calendar's hour.",
-        },
-        new()
-        {
-            Name = "MinuteStep",
-            Type = "int",
-            DefaultValue = "1",
-            Description = "Determines increment/decrement steps for calendar's minute.",
         }
     };
 
@@ -894,11 +880,4 @@ private BitCalendarValidationModel validationModel = new();
 
 private void HandleValidSubmit() { }
 private void HandleInvalidSubmit() { }";
-
-    private readonly string example10RazorCode = @"
-<BitCalendar Dir=""BitDir.Rtl"" />";
-
-    private readonly string example11RazorCode = @"
-<BitCalendar ShowTimePicker=""true"" HourStep=""2"" />
-<BitCalendar ShowTimePicker=""true"" MinuteStep=""15"" />";
 }

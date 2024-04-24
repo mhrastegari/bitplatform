@@ -9,8 +9,7 @@
                ComponentDescription="The OTP input is used for MFA procedure of authenticating users by a one-time password."
                ComponentParameters="componentParameters"
                ComponentSubClasses="componentSubClasses"
-               ComponentSubEnums="componentSubEnums"
-               ComponentPublicMembers="componentPublicMembers">
+               ComponentSubEnums="componentSubEnums">
     <ComponentExampleBox Title="Basic" RazorCode="@example1RazorCode" Id="example1">
         <ExamplePreview>
             <div class="example-box">
@@ -44,20 +43,20 @@
         </ExamplePreview>
     </ComponentExampleBox>
 
-    <ComponentExampleBox Title="Directions" RazorCode="@example3RazorCode" Id="example3">
+    <ComponentExampleBox Title="Direction" RazorCode="@example3RazorCode" Id="example3">
         <ExamplePreview>
             <div class="example-box">
-                <div class="lbl">Default</div>
-                <BitOtpInput />
+                <div class="lbl">Left to right</div>
+                <BitOtpInput Direction="BitOtpInputDirection.LeftToRight" />
                 <br />
-                <div class="lbl">Reversed</div>
-                <BitOtpInput Reversed />
+                <div class="lbl">Right to left</div>
+                <BitOtpInput Direction="BitOtpInputDirection.RightToLeft" />
                 <br />
-                <div class="lbl">Vertical</div>
-                <BitOtpInput Vertical />
+                <div class="lbl">Top to bottom</div>
+                <BitOtpInput Direction="BitOtpInputDirection.TopToBottom" />
                 <br />
-                <div class="lbl">Reversed Vertical</div>
-                <BitOtpInput Vertical Reversed />
+                <div class="lbl">Bottom to top</div>
+                <BitOtpInput Direction="BitOtpInputDirection.BottomToTop" />
             </div>
         </ExamplePreview>
     </ComponentExampleBox>
@@ -151,24 +150,6 @@
                         The form submitted successfully.
                     </BitMessageBar>
                 }
-            </div>
-        </ExamplePreview>
-    </ComponentExampleBox>
-
-    <ComponentExampleBox Title="RTL" RazorCode="@example8RazorCode" Id="example8">
-        <ExamplePreview>
-            <div class="example-box">
-                <div class="lbl">Default</div>
-                <BitOtpInput Dir="BitDir.Rtl" />
-                <br />
-                <div class="lbl">Reversed</div>
-                <BitOtpInput Reversed Dir="BitDir.Rtl" />
-                <br />
-                <div class="lbl">Vertical</div>
-                <BitOtpInput Vertical Dir="BitDir.Rtl" />
-                <br />
-                <div class="lbl">Reversed Vertical</div>
-                <BitOtpInput Vertical Reversed Dir="BitDir.Rtl" />
             </div>
         </ExamplePreview>
     </ComponentExampleBox>

@@ -16,77 +16,54 @@ permissions:
 jobs:
 
   build_api_blazor:
-    name: build api + blazor web
+    name: build api + blazor
     runs-on: ubuntu-22.04
 
     steps:
     
     - name: Checkout source code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
     
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v3
       with:
         global-json-file: src/Templates/Boilerplate/Bit.Boilerplate/global.json
 
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v3
       with:
-        node-version: 20
+        node-version: 18
 
     - name: Create project from Boilerplate
       run: |
         cd src/Templates/Boilerplate && dotnet build -c Release
         dotnet pack -c Release -o . -p:ReleaseVersion=0.0.0 -p:PackageVersion=0.0.0
         dotnet new install Bit.Boilerplate.0.0.0.nupkg
-        cd ../../../ && dotnet new bit-bp --name TodoSample --database SqlServer --sample Todo --appInsights
+        cd ../../../ && dotnet new bit-bp --name TodoSample --database SqlServer --sample Todo
 
     - name: Update appsettings.json api server address
-      uses: devops-actions/variable-substitution@v1.2 
+      uses: microsoft/variable-substitution@v1 
       with:
         files: 'TodoSample/src/Client/TodoSample.Client.Core/appsettings.json'
       env:
         ApiServerAddress: ${{ env.API_SERVER_ADDRESS }}
-        ApplicationInsights.ConnectionString: ${{ secrets.APPLICATION_INSIGHTS_CONNECTION_STRING }}
 
     - name: Install wasm
       run:  cd src && dotnet workload install wasm-tools wasm-experimental
 
-    - name: Configure app render mode
-      run: |
-          sed -i 's/public static readonly bool PrerenderEnabled = false;/public static readonly bool PrerenderEnabled = true;/g' TodoSample/src/Client/TodoSample.Client.Core/Services/AppRenderMode.cs
-          sed -i 's/Auto;/BlazorWebAssembly;/g' TodoSample/src/Client/TodoSample.Client.Core/Services/AppRenderMode.cs
-
-    - name: Changes for static-todo.bitplatform.dev - Part 1
-      run:  sed -i 's/http:\/\/localhost:4030/https:\/\/static-todo.bitplatform.dev/g' TodoSample/src/TodoSample.Server/Program.Middlewares.cs
+    - name: Enable pre rendering
+      run:  sed -i 's/public static readonly bool PrerenderEnabled = false;/public static readonly bool PrerenderEnabled = true;/g' TodoSample/src/Client/TodoSample.Client.Core/Services/AppRenderMode.cs
 
     - name: Generate CSS/JS files
-      run: dotnet build TodoSample/src/Client/TodoSample.Client.Core/TodoSample.Client.Core.csproj -t:BeforeBuildTasks -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}" --no-restore
+      run: dotnet build TodoSample/src/Client/TodoSample.Client.Core/TodoSample.Client.Core.csproj -t:BeforeBuildTasks --no-restore
 
     - name: Publish
-      run: dotnet publish TodoSample/src/TodoSample.Server/TodoSample.Server.csproj -c Release -p:PwaEnabled=true --self-contained -r linux-x64 -o ${{env.DOTNET_ROOT}}/server -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}"
+      run: dotnet publish TodoSample/src/TodoSample.Server/TodoSample.Server.csproj -c Release -p:PwaEnabled=true --self-contained -r linux-x64 -o ${{env.DOTNET_ROOT}}/server
 
     - name: Upload server artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: server-bundle
         path: ${{env.DOTNET_ROOT}}/server
-
-    - name: Changes for static-todo.bitplatform.dev - Part 2
-      run:  sed -i 's/public static readonly bool PrerenderEnabled = true;/public static readonly bool PrerenderEnabled = false;/g' TodoSample/src/Client/TodoSample.Client.Core/Services/AppRenderMode.cs
-
-    - name: Configure bswup
-      run: |
-          sed -i 's/self.noPrerenderQuery/\/\/ self.noPrerenderQuery/g' TodoSample/src/Client/TodoSample.Client.Web/wwwroot/service-worker.js
-          sed -i 's/self.isPassive = self.disablePassiveFirstBoot = true;/self.isPassive = self.disablePassiveFirstBoot = false;/g' TodoSample/src/Client/TodoSample.Client.Web/wwwroot/service-worker.js
-
-    - name: Publish static todo
-      run: dotnet publish TodoSample/src/Client/TodoSample.Client.Web/TodoSample.Client.Web.csproj -c Release -p:BlazorWebAssemblyStandalone=true -o ${{env.DOTNET_ROOT}}/static
-
-    - name: Upload static artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: static-bundle
-        path: ${{env.DOTNET_ROOT}}/static
 
   deploy_api_blazor:
     name: deploy api + blazor
@@ -99,7 +76,7 @@ jobs:
     steps:
 
       - name: Retrieve server bundle
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v2
         with:
           name: server-bundle
 
@@ -108,7 +85,7 @@ jobs:
             rm IdentityCertificate.pfx
 
       - name: Extract identity certificate from env
-        uses: timheuer/base64-to-file@v1.2
+        uses: timheuer/base64-to-file@v1
         with:
             fileDir: './'
             fileName: 'IdentityCertificate.pfx'
@@ -136,59 +113,45 @@ jobs:
     steps:
      
     - name: Checkout source code
-      uses: actions/checkout@v4
-
+      uses: actions/checkout@v3
+     
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v3
       with:
-        global-json-file: src\Templates\Boilerplate\Bit.Boilerplate\global.json
+        global-json-file: src/Templates/Boilerplate/Bit.Boilerplate/global.json
 
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v3
       with:
-        node-version: 20
+        node-version: 18
 
     - name: Create project from Boilerplate
       run: |
-        cd src\Templates\Boilerplate && dotnet build -c Release
+        cd src/Templates/Boilerplate && dotnet build -c Release
         dotnet pack -c Release -o . -p:ReleaseVersion=0.0.0 -p:PackageVersion=0.0.0
         dotnet new install Bit.Boilerplate.0.0.0.nupkg
-        cd ..\..\..\ && dotnet new bit-bp --name TodoSample --database SqlServer --sample Todo --windows --appInsights
+        cd ../../../ && dotnet new bit-bp --name TodoSample --database SqlServer --sample Todo
   
     - name: Update appsettings.json api server address
-      uses: devops-actions/variable-substitution@v1.2 
+      uses: microsoft/variable-substitution@v1 
       with:
-        files: 'TodoSample\src\Client\TodoSample.Client.Core\appsettings.json'
+        files: 'TodoSample/src/Client/TodoSample.Client.Core/appsettings.json'
       env:
         ApiServerAddress: ${{ env.API_SERVER_ADDRESS }}
-        WindowsUpdateSettings.FilesUrl: https://windows-todo.bitplatform.dev
-        ApplicationInsights.ConnectionString: ${{ secrets.APPLICATION_INSIGHTS_CONNECTION_STRING }}
+
+    - name: Install maui
+      run: cd src && dotnet workload install maui
   
     - name: Generate CSS/JS files
-      run: dotnet build TodoSample\src\Client\TodoSample.Client.Core\TodoSample.Client.Core.csproj -t:BeforeBuildTasks -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}" --no-restore
-
-    - name: Publish
-      run: |
-          cd TodoSample\src\Client\TodoSample.Client.Windows\
-          dotnet publish TodoSample.Client.Windows.csproj -c Release -o .\bin\publish-arm64 -r win-arm64 -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}"
-          ren .\bin\publish-arm64\TodoSample.Client.Windows.exe TodoSample.Client.Windows-arm64.exe
-          dotnet publish TodoSample.Client.Windows.csproj -c Release -o .\bin\publish-x86 -r win-x86 -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}"
-          ren .\bin\publish-x86\TodoSample.Client.Windows.exe TodoSample.Client.Windows-x86.exe
-          dotnet publish TodoSample.Client.Windows.csproj -c Release -o .\bin\publish-x64 -r win-x64 -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}"
-          ren .\bin\publish-x64\TodoSample.Client.Windows.exe TodoSample.Client.Windows-x64.exe
-          dotnet publish TodoSample.Client.Windows.csproj -c Release -o .\bin\publish -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}"
-          del .\bin\publish\TodoSample.Client.Windows.exe
-          echo D | xcopy .\bin\publish-arm64 .\publish-result /s /e /h
-          echo A | xcopy .\bin\publish-x86 .\publish-result /s /e /h
-          echo A | xcopy .\bin\publish-x64 .\publish-result /s /e /h
-          echo A | xcopy .\bin\publish .\publish-result /s /e /h
-          dotnet tool restore
-          dotnet vpk pack -u TodoSample.Client.Windows -v "${{ vars.APPLICATION_DISPLAY_VERSION }}" -p .\publish-result -e TodoSample.Client.Windows-x86.exe -r win-x86 --framework net8.0.4-x86-desktop,webview2 --icon .\wwwroot\favicon.ico --packTitle TodoSample
+      run: dotnet build TodoSample/src/Client/TodoSample.Client.Core/TodoSample.Client.Core.csproj -t:BeforeBuildTasks --no-restore
+  
+    - name: Build exe
+      run: dotnet build TodoSample/src/Client/TodoSample.Client.Maui/TodoSample.Client.Maui.csproj -c Release -p:WindowsPackageType=None -p:SelfContained=true -p:WindowsAppSDKSelfContained=true -p:GenerateAppxPackageOnBuild=false -p:RuntimeIdentifier=win10-x86 -p:ApplicationDisplayVersion="${{ vars.APPLICATION_DISPLAY_VERSION }}" -p:ApplicationVersion="${{ vars.APPLICATION_VERSION }}" -p:ApplicationTitle="TodoSample" -p:ApplicationId="com.bitplatform.Todo.Template" -p:UseRidGraph=true -f net8.0-windows10.0.19041.0
   
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: win-exe-bundle
-        path: TodoSample\src\Client\TodoSample.Client.Windows\Releases
+        path: TodoSample/src/Client/TodoSample.Client.Maui/bin/release/net8.0-windows10.0.19041.0/win10-x86
   
   build_blazor_hybrid_android:
     name: build blazor hybrid (android)
@@ -197,38 +160,37 @@ jobs:
     steps:
      
     - name: Checkout source code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
      
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v3
       with:
         global-json-file: src/Templates/Boilerplate/Bit.Boilerplate/global.json
 
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v3
       with:
-        node-version: 20
+        node-version: 18
 
     - name: Create project from Boilerplate
       run: |
         cd src/Templates/Boilerplate && dotnet build -c Release
         dotnet pack -c Release -o . -p:ReleaseVersion=0.0.0 -p:PackageVersion=0.0.0
         dotnet new install Bit.Boilerplate.0.0.0.nupkg
-        cd ../../../ && dotnet new bit-bp --name TodoSample --database SqlServer --sample Todo --appInsights
+        cd ../../../ && dotnet new bit-bp --name TodoSample --database SqlServer --sample Todo
   
     - name: Extract Android signing key from env
-      uses: timheuer/base64-to-file@v1.2
+      uses: timheuer/base64-to-file@v1
       with:
           fileDir: './TodoSample/src/Client/TodoSample.Client.Maui/'
           fileName: 'TodoSample.keystore'
           encodedString: ${{ secrets.ANDROID_RELEASE_KEYSTORE_FILE_BASE64 }}
   
     - name: Update appsettings.json api server address
-      uses: devops-actions/variable-substitution@v1.2 
+      uses: microsoft/variable-substitution@v1 
       with:
         files: 'TodoSample/src/Client/TodoSample.Client.Core/appsettings.json'
       env:
         ApiServerAddress: ${{ env.API_SERVER_ADDRESS }}
-        ApplicationInsights.ConnectionString: ${{ secrets.APPLICATION_INSIGHTS_CONNECTION_STRING }}
         
     - name: Set android universal link
       run:  sed -i 's/bp.bitplatform.dev/todo.bitplatform.dev/g' TodoSample/src/Client/TodoSample.Client.Maui/Platforms/Android/MainActivity.cs
@@ -236,79 +198,103 @@ jobs:
     - name: Install maui
       run: cd src && dotnet workload install maui-android
 
-    - name: Install Android Sdk platform tools
-      run: ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools"
+    - name: Install Android Dependencies
+      run: dotnet build TodoSample/src/Client/TodoSample.Client.Maui/TodoSample.Client.Maui.csproj -t:InstallAndroidDependencies -f:net8.0-android -p:AcceptAndroidSDKLicenses=True -p:AndroidSdkPath="/usr/local/lib/android/sdk/"
   
-    - name: Delete App Icon
-      run: rm TodoSample/src/Client/TodoSample.Client.Maui/Resources/AppIcon/appicon.svg
-
-    - name: Extract App Icon from env
-      uses: timheuer/base64-to-file@v1.2
-      with:
-          fileDir: './TodoSample/src/Client/TodoSample.Client.Maui/Resources/AppIcon/'
-          fileName: 'appicon.svg'
-          encodedString: ${{ vars.TODO_ICON }}
-
-    - name: Delete App Splash Screen
-      run: rm TodoSample/src/Client/TodoSample.Client.Maui/Resources/Splash/splash.svg
-
-    - name: Extract App Splash Screen from env
-      uses: timheuer/base64-to-file@v1.2
-      with:
-          fileDir: './TodoSample/src/Client/TodoSample.Client.Maui/Resources/Splash/'
-          fileName: 'splash.svg'
-          encodedString: ${{ vars.TODO_SPLASH_SCREEN }}
-
     - name: Generate CSS/JS files
-      run: |
-          dotnet build TodoSample/src/Client/TodoSample.Client.Core/TodoSample.Client.Core.csproj -t:BeforeBuildTasks -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}" --no-restore
-          dotnet build TodoSample/src/Client/TodoSample.Client.Maui/TodoSample.Client.Maui.csproj -t:BeforeBuildTasks -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}" --no-restore
+      run: dotnet build TodoSample/src/Client/TodoSample.Client.Core/TodoSample.Client.Core.csproj -t:BeforeBuildTasks --no-restore
   
     - name: Build aab
-      run: dotnet build TodoSample/src/Client/TodoSample.Client.Maui/TodoSample.Client.Maui.csproj -c Release -p:AndroidPackageFormat=aab -p:AndroidKeyStore=true -p:AndroidSigningKeyStore="TodoSample.keystore" -p:AndroidSigningKeyAlias=bitplatform -p:AndroidSigningKeyPass="${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -p:AndroidSigningStorePass="${{ secrets.ANDROID_RELEASE_SIGNING_PASSWORD }}" -p:ApplicationDisplayVersion="${{ vars.APPLICATION_DISPLAY_VERSION }}" -p:ApplicationVersion="${{ vars.APPLICATION_VERSION }}" -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}" -p:ApplicationTitle="TodoSample" -p:ApplicationId="com.bitplatform.Todo.Template" -f net8.0-android
+      run: dotnet build TodoSample/src/Client/TodoSample.Client.Maui/TodoSample.Client.Maui.csproj -c Release -p:AndroidPackageFormat=aab -p:AndroidKeyStore=true -p:AndroidSigningKeyStore="TodoSample.keystore" -p:AndroidSigningKeyAlias=bitplatform -p:AndroidSigningKeyPass="${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -p:AndroidSigningStorePass="${{ secrets.ANDROID_RELEASE_SIGNING_PASSWORD }}" -p:ApplicationDisplayVersion="${{ vars.APPLICATION_DISPLAY_VERSION }}" -p:ApplicationVersion="${{ vars.APPLICATION_VERSION }}" -p:ApplicationTitle="TodoSample" -p:ApplicationId="com.bitplatform.Todo.Template" -f net8.0-android
   
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: android-bundle
         path: TodoSample/src/Client/TodoSample.Client.Maui/bin/Release/net8.0-android/*-Signed.*
-        
+  
+  build_blazor_hybrid_maccatalyst:
+     name: build blazor hybrid (maccatalyst)
+     runs-on: macos-13
+   
+     steps:
+      
+     - name: Checkout source code
+       uses: actions/checkout@v3
+      
+     - name: Setup .NET
+       uses: actions/setup-dotnet@v3
+       with:
+         global-json-file: src/Templates/Boilerplate/Bit.Boilerplate/global.json
+
+     - uses: actions/setup-node@v3
+       with:
+        node-version: 18
+
+     - name: Create project from Boilerplate
+       run: |
+         cd src/Templates/Boilerplate && dotnet build -c Release
+         dotnet pack -c Release -o . -p:ReleaseVersion=0.0.0 -p:PackageVersion=0.0.0
+         dotnet new install Bit.Boilerplate.0.0.0.nupkg
+         cd ../../../ && dotnet new bit-bp --name TodoSample --database SqlServer --sample Todo
+   
+     - name: Update appsettings.json api server address
+       uses: microsoft/variable-substitution@v1 
+       with:
+         files: 'TodoSample/src/Client/TodoSample.Client.Core/appsettings.json'
+       env:
+         ApiServerAddress: ${{ env.API_SERVER_ADDRESS }}
+
+     - name: Install maui
+       run: cd src && dotnet workload install maui
+   
+     - name: Generate CSS/JS files
+       run: dotnet build TodoSample/src/Client/TodoSample.Client.Core/TodoSample.Client.Core.csproj -t:BeforeBuildTasks --no-restore
+   
+     - name: Build pkg
+       run: dotnet build TodoSample/src/Client/TodoSample.Client.Maui/TodoSample.Client.Maui.csproj -c Release -p:CreatePackage=true -p:ApplicationDisplayVersion="${{ vars.APPLICATION_DISPLAY_VERSION }}" -p:ApplicationVersion="${{ vars.APPLICATION_VERSION }}" -p:ApplicationTitle="TodoSample" -p:ApplicationId="com.bitplatform.Todo.Template" -f net8.0-maccatalyst
+   
+     - name: Upload artifact
+       uses: actions/upload-artifact@v2
+       with:
+         name: mac-pkg-bundle
+         path: TodoSample/src/Client/TodoSample.Client.Maui/bin/release/net8.0-maccatalyst/*.pkg
+
   build_blazor_hybrid_ios:
-    name: build blazor hybrid (iOS-macOS)
-    runs-on: macos-14
+    name: build blazor hybrid (ios)
+    runs-on: macos-13
   
     steps:
      
     - name: Checkout source code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
      
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v3
       with:
         global-json-file: src/Templates/Boilerplate/Bit.Boilerplate/global.json
 
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v3
       with:
-        node-version: 20
+        node-version: 18
 
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.3'
+        xcode-version: '15'
 
     - name: Create project from Boilerplate
       run: |
         cd src/Templates/Boilerplate && dotnet build -c Release
         dotnet pack -c Release -o . -p:ReleaseVersion=0.0.0 -p:PackageVersion=0.0.0
         dotnet new install Bit.Boilerplate.0.0.0.nupkg
-        cd ../../../ && dotnet new bit-bp --name TodoSample --database SqlServer --sample Todo --appInsights
+        cd ../../../ && dotnet new bit-bp --name TodoSample --database SqlServer --sample Todo
       
     - name: Update appsettings.json api server address
-      uses: devops-actions/variable-substitution@v1.2 
+      uses: microsoft/variable-substitution@v1 
       with:
         files: 'TodoSample/src/Client/TodoSample.Client.Core/appsettings.json'
       env:
         ApiServerAddress: ${{ env.API_SERVER_ADDRESS }}
-        ApplicationInsights.ConnectionString: ${{ secrets.APPLICATION_INSIGHTS_CONNECTION_STRING }}
         
     - name: Set iOS universal link
       run:  brew install gnu-sed && gsed -i 's/bp.bitplatform.dev/todo.bitplatform.dev/g' TodoSample/src/Client/TodoSample.Client.Maui/Platforms/iOS/Entitlements.plist
@@ -317,14 +303,14 @@ jobs:
       run: cd src && dotnet workload install maui
   
     - name: Extract iOS code signing certificate from env
-      uses: timheuer/base64-to-file@v1.2
+      uses: timheuer/base64-to-file@v1
       with:
           fileDir: './'
           fileName: 'DistributionCert.p12'
           encodedString: ${{ secrets.APPSTORE_CODE_SIGNING_CERTIFICATE_FILE_BASE64 }}
 
     - name: Import Code-Signing Certificates
-      uses: apple-actions/import-codesign-certs@v2
+      uses: Apple-Actions/import-codesign-certs@v1
       with:
         p12-filepath: './DistributionCert.p12'
         p12-password: ${{ secrets.APPSTORE_CODE_SIGNING_CERTIFICATE_FILE_PASSWORD }}
@@ -337,33 +323,11 @@ jobs:
         api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
         api-private-key: ${{ secrets.APPSTORE_API_KEY_PRIVATE_KEY }}
 
-    - name: Delete App Icon
-      run: rm TodoSample/src/Client/TodoSample.Client.Maui/Resources/AppIcon/appicon.svg
-
-    - name: Extract App Icon from env
-      uses: timheuer/base64-to-file@v1.2
-      with:
-          fileDir: './TodoSample/src/Client/TodoSample.Client.Maui/Resources/AppIcon/'
-          fileName: 'appicon.svg'
-          encodedString: ${{ vars.TODO_ICON }}
-
-    - name: Delete App Splash Screen
-      run: rm TodoSample/src/Client/TodoSample.Client.Maui/Resources/Splash/splash.svg
-
-    - name: Extract App Splash Screen from env
-      uses: timheuer/base64-to-file@v1.2
-      with:
-          fileDir: './TodoSample/src/Client/TodoSample.Client.Maui/Resources/Splash/'
-          fileName: 'splash.svg'
-          encodedString: ${{ vars.TODO_SPLASH_SCREEN }}
-
     - name: Generate CSS/JS files
-      run: |
-          dotnet build TodoSample/src/Client/TodoSample.Client.Core/TodoSample.Client.Core.csproj -t:BeforeBuildTasks -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}" --no-restore
-          dotnet build TodoSample/src/Client/TodoSample.Client.Maui/TodoSample.Client.Maui.csproj -t:BeforeBuildTasks -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}" --no-restore
+      run: dotnet build TodoSample/src/Client/TodoSample.Client.Core/TodoSample.Client.Core.csproj -t:BeforeBuildTasks --no-restore
   
     - name: Build ipa
-      run: dotnet publish TodoSample/src/Client/TodoSample.Client.Maui/TodoSample.Client.Maui.csproj -p:RuntimeIdentifier=ios-arm64 -c Release -p:ArchiveOnBuild=true -p:CodesignKey="iPhone Distribution" -p:CodesignProvision="TodoTemplate" -p:ApplicationDisplayVersion="${{ vars.APPLICATION_DISPLAY_VERSION }}" -p:ApplicationVersion="${{ vars.APPLICATION_VERSION }}" -p:Version="${{ vars.APPLICATION_DISPLAY_VERSION}}" -p:ApplicationTitle="Todo" -p:ApplicationId="com.bitplatform.Todo.Template" -f net8.0-ios
+      run: dotnet publish TodoSample/src/Client/TodoSample.Client.Maui/TodoSample.Client.Maui.csproj -p:RuntimeIdentifier=ios-arm64 -c Release -p:ArchiveOnBuild=true -p:CodesignKey="iPhone Distribution" -p:CodesignProvision="TodoTemplate" -p:ApplicationDisplayVersion="${{ vars.APPLICATION_DISPLAY_VERSION }}" -p:ApplicationVersion="${{ vars.APPLICATION_VERSION }}" -p:ApplicationTitle="Todo" -p:ApplicationId="com.bitplatform.Todo.Template" -f net8.0-ios
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2

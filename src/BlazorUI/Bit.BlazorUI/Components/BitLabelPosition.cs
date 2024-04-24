@@ -3,7 +3,7 @@
 public enum BitLabelPosition
 {
     Top,
-    End,
+    Right,
     Bottom,
-    Start
+    Left
 }

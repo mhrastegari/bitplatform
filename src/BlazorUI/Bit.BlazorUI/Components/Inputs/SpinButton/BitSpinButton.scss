@@ -5,7 +5,6 @@
     font-weight: 400;
     align-items: center;
     font-size: spacing(5);
-    column-gap: spacing(1.25);
     font-family: $typography-font-family;
 
     &.bit-dis {
@@ -190,10 +189,19 @@
     flex-direction: column-reverse;
 }
 
-.bit-spb-lst {
+.bit-spb-llf {
     flex-direction: row;
+
+    .bit-spb-lct {
+        margin-right: spacing(1.25);
+    }
 }
 
-.bit-spb-led {
+.bit-spb-lrt {
+    justify-content: flex-end;
     flex-direction: row-reverse;
+
+    .bit-spb-lct {
+        margin-left: spacing(1.25);
+    }
 }

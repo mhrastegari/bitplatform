@@ -1,5 +1,4 @@
-﻿//+:cnd:noEmit
-namespace Boilerplate.Shared.Dtos.Identity;
+﻿namespace Boilerplate.Shared.Dtos.Identity;
 
 [DtoResourceType(typeof(AppStrings))]
 public class SignUpRequestDto
@@ -19,11 +18,8 @@ public class SignUpRequestDto
     public string? Password { get; set; }
 
     /// <example>true</example>
+    [NotMapped]
     [Range(typeof(bool), "true", "true", ErrorMessage = nameof(AppStrings.YouHaveToAcceptTerms))]
     [Display(Name = nameof(AppStrings.TermsAccepted))]
     public bool TermsAccepted { get; set; }
-
-    //#if (captcha == "reCaptcha")
-    public string? GoogleRecaptchaResponse { get; set; }
-    //#endif
 }

@@ -4,8 +4,7 @@
 <div @ref="RootElement" @attributes="HtmlAttributes"
      id="@_Id"
      style="@StyleBuilder.Value"
-     class="@ClassBuilder.Value"
-     dir="@Dir?.ToString().ToLower()">
+     class="@ClassBuilder.Value">
 
     <div style="@Styles?.Container" class="bit-cal-cnt @Classes?.Container" disabled=@(IsEnabled is false)>
         <div class="bit-cal-sdt" aria-live="polite" aria-atomic="true">

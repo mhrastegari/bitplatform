@@ -1,18 +1,10 @@
 ﻿//-:cnd:noEmit
-using Microsoft.Maui.LifecycleEvents;
-using Maui.AppStores;
-using Maui.InAppReviews;
-using Maui.Android.InAppUpdates;
 using Boilerplate.Client.Core;
-#if IOS || MACCATALYST
-using UIKit;
-using WebKit;
-using Foundation;
-#endif
+using Microsoft.Maui.LifecycleEvents;
 
 namespace Boilerplate.Client.Maui;
 
-public static partial class MauiProgram
+public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
@@ -22,21 +14,39 @@ public static partial class MauiProgram
 
         builder
             .UseMauiApp<App>()
-            .UseAndroidInAppUpdates()
-            .UseInAppReviews()
-            .UseAppStoreInfo()
             .Configuration.AddClientConfigurations();
 
-        builder.ConfigureServices();
+        var services = builder.Services;
+
+        services.AddMauiBlazorWebView();
+
+        if (BuildConfiguration.IsDebug())
+        {
+            services.AddBlazorWebViewDeveloperTools();
+        }
+
+        Uri.TryCreate(builder.Configuration.GetApiServerAddress(), UriKind.Absolute, out var apiServerAddress);
+
+        services.AddTransient(sp =>
+        {
+            var handler = sp.GetRequiredKeyedService<HttpMessageHandler>("DefaultMessageHandler");
+            HttpClient httpClient = new(handler)
+            {
+                BaseAddress = apiServerAddress
+            };
+            return httpClient;
+        });
+
+        services.AddClientMauiServices();
 
         builder.ConfigureLifecycleEvents(lifecycle =>
         {
 #if iOS || Mac
             lifecycle.AddiOS(ios =>
             {
-                bool HandleAppLink(NSUserActivity? userActivity)
+                bool HandleAppLink(Foundation.NSUserActivity? userActivity)
                 {
-                    if (userActivity is not null && userActivity.ActivityType == NSUserActivityType.BrowsingWeb && userActivity.WebPageUrl is not null)
+                    if (userActivity is not null && userActivity.ActivityType == Foundation.NSUserActivityType.BrowsingWeb && userActivity.WebPageUrl is not null)
                     {
                         var url = $"{userActivity.WebPageUrl.Path}?{userActivity.WebPageUrl.Query}";
 
@@ -58,7 +68,7 @@ public static partial class MauiProgram
                 {
                     ios.SceneWillConnect((scene, sceneSession, sceneConnectionOptions)
                         => HandleAppLink(sceneConnectionOptions.UserActivities.ToArray()
-                            .FirstOrDefault(a => a.ActivityType == NSUserActivityType.BrowsingWeb)));
+                            .FirstOrDefault(a => a.ActivityType == Foundation.NSUserActivityType.BrowsingWeb)));
 
                     ios.SceneContinueUserActivity((scene, userActivity)
                         => HandleAppLink(userActivity));
@@ -67,96 +77,8 @@ public static partial class MauiProgram
 #endif
         });
 
-        SetupBlazorWebView();
-
         var mauiApp = builder.Build();
 
         return mauiApp;
     }
-
-    private static void SetupBlazorWebView()
-    {
-        BlazorWebViewHandler.BlazorWebViewMapper.AppendToMapping("CustomBlazorWebViewMapper", static (handler, view) =>
-        {
-            var webView = handler.PlatformView;
-#if WINDOWS
-            if (AppInfo.Current.RequestedTheme == AppTheme.Dark)
-            {
-                webView.DefaultBackgroundColor = Microsoft.UI.Colors.Black;
-            }
-
-            if (BuildConfiguration.IsRelease())
-            {
-                webView.EnsureCoreWebView2Async()
-                    .AsTask()
-                    .ContinueWith(async _ =>
-                    {
-                        await Application.Current!.Dispatcher.DispatchAsync(() =>
-                        {
-                            var settings = webView.CoreWebView2.Settings;
-                            settings.IsZoomControlEnabled = false;
-                            settings.AreBrowserAcceleratorKeysEnabled = false;
-                        });
-                    });
-            }
-
-#elif IOS || MACCATALYST
-            webView.NavigationDelegate = new CustomWKNavigationDelegate();
-            webView.Configuration.AllowsInlineMediaPlayback = true;
-
-            webView.BackgroundColor = UIColor.Clear;
-            webView.ScrollView.Bounces = false;
-            webView.Opaque = false;
-
-            if (BuildConfiguration.IsDebug())
-            {
-                if ((DeviceInfo.Current.Platform == DevicePlatform.MacCatalyst && DeviceInfo.Current.Version >= new Version(13, 3))
-                    || (DeviceInfo.Current.Platform == DevicePlatform.iOS && DeviceInfo.Current.Version >= new Version(16, 4)))
-                {
-                    webView.SetValueForKey(NSObject.FromObject(true), new NSString("inspectable"));
-                }
-            }
-#elif ANDROID
-                webView.SetBackgroundColor(Android.Graphics.Color.Transparent);
-
-                webView.OverScrollMode = Android.Views.OverScrollMode.Never;
-
-                webView.HapticFeedbackEnabled = false;
-
-                Android.Webkit.WebSettings settings = webView.Settings;
-
-                settings.AllowFileAccessFromFileURLs =
-                    settings.AllowUniversalAccessFromFileURLs =
-                    settings.AllowContentAccess =
-                    settings.AllowFileAccess =
-                    settings.DatabaseEnabled =
-                    settings.JavaScriptCanOpenWindowsAutomatically =
-                    settings.DomStorageEnabled = true;
-
-                if (BuildConfiguration.IsDebug())
-                {
-                    settings.MixedContentMode = Android.Webkit.MixedContentHandling.AlwaysAllow;
-                }
-
-                settings.BlockNetworkLoads = settings.BlockNetworkImage = false;
-#endif
-        });
-    }
-
-#if IOS || MACCATALYST
-    public class CustomWKNavigationDelegate : WKNavigationDelegate
-    {
-        public override void DecidePolicy(WKWebView webView, WKNavigationAction navigationAction, WKWebpagePreferences preferences, Action<WKNavigationActionPolicy, WKWebpagePreferences> decisionHandler)
-        {
-            // To open Google reCAPTCHA and similar elements directly within the webview.
-            decisionHandler?.Invoke(WKNavigationActionPolicy.Allow, preferences);
-
-            if (navigationAction.NavigationType is WKNavigationType.LinkActivated)
-            {
-                // https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated#discussion
-                _ = Browser.OpenAsync(navigationAction.Request.Url!);
-            }
-        }
-    }
-#endif
 }

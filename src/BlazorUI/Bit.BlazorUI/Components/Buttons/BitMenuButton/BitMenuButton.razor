@@ -10,16 +10,15 @@
 <div @ref="RootElement" @attributes="HtmlAttributes"
      id="@_Id"
      style="@StyleBuilder.Value"
-     class="@ClassBuilder.Value"
-     dir="@Dir?.ToString().ToLower()">
+     class="@ClassBuilder.Value">
     <button @onclick="() => HandleOnClick(Sticky ? SelectedItem : null)"
             type="button"
             tabindex="@(IsEnabled ? 0 : -1)"
             aria-label="@AriaLabel"
             aria-hidden="@AriaHidden"
             aria-describedby="@AriaDescription"
-            style="@GetStyle(SelectedItem);@Styles?.OperatorButton"
-            class="bit-mnb-opb @(GetIsEnabled(SelectedItem) ? "" : "bit-dis") @GetClass(SelectedItem) @Classes?.OperatorButton">
+            style="@GetStyle(SelectedItem);@Styles?.ItemButton"
+            class="bit-mnb-opb @(GetIsEnabled(SelectedItem) ? "" : "bit-dis") @GetClass(SelectedItem) @Classes?.ItemButton">
         @if (Sticky)
         {
             var template = GetTemplate(SelectedItem);
@@ -36,9 +35,9 @@
                 var iconName = GetIconName(SelectedItem);
                 @if (iconName.HasValue())
                 {
-                    <i style="@Styles?.OperatorButtonIcon" class="bit-icon bit-icon--@iconName @Classes?.OperatorButtonIcon" />
+                    <i style="@Styles?.ItemIcon" class="bit-icon bit-icon--@iconName @Classes?.ItemIcon" />
                 }
-                <span style="@Styles?.OperatorButtonText" class="bit-mnb-btx @Classes?.OperatorButtonText">
+                <span style="@Styles?.ItemText" class="bit-mnb-btx @Classes?.ItemText">
                     @GetText(SelectedItem)
                 </span>
             }
@@ -94,12 +93,12 @@
             {
                 if (Sticky && item == SelectedItem) continue;
 
-                var template = GetTemplate(item);
                 var isEnabled = GetIsEnabled(item);
-                <li role="presentation" @key="GetKey(item)">
+                var template = GetTemplate(item);
+                <li role="presentation">
                     <button @onclick="() => HandleOnItemClick(item)" @onclick:stopPropagation
                             role="menuitem"
-                            aria-disabled="@(isEnabled is false)"
+                            aria-disabled="@isEnabled"
                             type="@_buttonType.GetValue()"
                             tabindex="@(isEnabled ? 0 : -1)"
                             style="@GetStyle(item);@Styles?.ItemButton"

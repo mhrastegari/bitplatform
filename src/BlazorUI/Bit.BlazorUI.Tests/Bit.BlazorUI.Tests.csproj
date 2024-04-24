@@ -7,17 +7,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Include="..\Bit.BlazorUI\Components\ColorPicker\BitInternalColor.cs" Link="ColorPicker\BitInternalColor.cs" />
-	  <Compile Include="..\Bit.BlazorUI\Extensions\EnumExtensions.cs" Link="Extensions\EnumExtensions.cs" />
-	  <Compile Include="..\Bit.BlazorUI\Extensions\StringExtensions.cs" Link="Extensions\StringExtensions.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="bunit.web" Version="1.27.17" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-		<PackageReference Include="MSTest.TestAdapter" Version="3.3.1" />
-		<PackageReference Include="MSTest.TestFramework" Version="3.3.1" />
-		<PackageReference Include="coverlet.collector" Version="6.0.2">
+		<PackageReference Include="bunit.web" Version="1.25.3" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+		<PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
+		<PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
+		<PackageReference Include="coverlet.collector" Version="6.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

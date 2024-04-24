@@ -151,28 +151,6 @@ public partial class _BitMenuButtonItemDemo
         }
     };
 
-    private List<BitMenuButtonItem> rtlItemsIcon = new()
-    {
-        new()
-        {
-            Text = "گزینه الف",
-            Key = "A",
-            IconName = BitIconName.Emoji
-        },
-        new()
-        {
-            Text = "گزینه ب",
-            Key = "B",
-            IconName = BitIconName.Emoji
-        },
-        new()
-        {
-            Text = "گزینه ج",
-            Key = "C",
-            IconName = BitIconName.Emoji2
-        }
-    };
-
     protected override void OnInitialized()
     {
         twoWaySelectedItem = basicItems[2];
@@ -632,40 +610,4 @@ protected override void OnInitialized()
 {
     twoWaySelectedItem = basicItems[2];
 }";
-
-    private readonly string example12RazorCode = @"
-<BitMenuButton Text=""گزینه ها""
-               Dir=""BitDir.Rtl""
-               Items=""rtlItemsIcon""
-               IconName=""@BitIconName.Edit"" />
-
-<BitMenuButton Split
-               Text=""گزینه ها""
-               Dir=""BitDir.Rtl""
-               Items=""rtlItemsIcon""
-               IconName=""@BitIconName.Add""
-               ButtonStyle=""BitButtonStyle.Standard""
-               ChevronDownIcon=""@BitIconName.DoubleChevronDown"" />";
-    private readonly string example12CsharpCode = @"
- private List<BitMenuButtonItem> rtlItemsIcon = new()
- {
-    new()
-    {
-        Text = ""گزینه الف"",
-        Key = ""A"",
-        IconName = BitIconName.Emoji
-    },
-    new()
-    {
-        Text = ""گزینه ب"",
-        Key = ""B"",
-        IconName = BitIconName.Emoji
-    },
-    new()
-    {
-        Text = ""گزینه ج"",
-        Key = ""C"",
-        IconName = BitIconName.Emoji2
-    }
- };";
 }

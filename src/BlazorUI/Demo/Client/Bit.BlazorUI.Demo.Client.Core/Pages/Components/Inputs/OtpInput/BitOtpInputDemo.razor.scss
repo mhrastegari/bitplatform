@@ -4,7 +4,7 @@
 
 .example-box {
     display: flex;
-    max-width: max-content;
+    max-width: rem2(300px);
     flex-flow: column nowrap;
 
     .lbl {

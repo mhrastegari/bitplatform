@@ -263,7 +263,4 @@ public BitToggleValidationModel validationModel { get; set; } = new();
 
 private async Task HandleValidSubmit() { }
 private void HandleInvalidSubmit() { }";
-
-    private readonly string example7RazorCode = @"
-<BitToggle Dir=""BitDir.Rtl"" OnText=""روشن"" OffText=""خاموش"" />";
 }

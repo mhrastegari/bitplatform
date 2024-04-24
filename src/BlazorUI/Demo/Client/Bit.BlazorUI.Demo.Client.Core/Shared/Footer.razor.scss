@@ -9,13 +9,14 @@ footer {
     box-sizing: border-box;
     flex-flow: column nowrap;
     justify-content: flex-start;
+    background-color: $bit-color-background-secondary;
 }
 
 section {
     width: 100%;
     position: relative;
-    box-sizing: border-box;
     max-width: rem2(1200px);
+    box-sizing: border-box;
     padding: rem2(100px) rem2(16px);
 
     &:first-child {
@@ -23,9 +24,13 @@ section {
         gap: rem2(40px);
         align-items: center;
         grid-auto-columns: 1fr;
-        grid-template-rows: auto;
         grid-template-columns: 1fr 1fr;
         justify-content: space-between;
+        grid-template-rows: auto;
+
+        @include lg {
+            grid-template-columns: 1fr 1.75fr;
+        }
     }
 
     &:last-child {
@@ -48,25 +53,6 @@ section {
     }
 }
 
-a {
-    text-decoration: none;
-}
-
-.links-container {
-    gap: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-}
-
-.column {
-    height: 100%;
-    display: flex;
-    align-items: flex-start;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-}
-
 .bit-logo {
     width: rem2(32px);
     height: rem2(27px);
@@ -79,21 +65,22 @@ a {
 
 .go-to-top {
     bottom: 0;
-    cursor: pointer;
     right: rem2(2px);
+    cursor: pointer;
     position: absolute;
     padding: rem2(8px) rem2(12px);
-    background-color: $bit-color-background-secondary;
+    color: #EEEE;
+    background-color: #888;
+}
 
-    &:hover {
-        background-color: $bit-color-action-hover-background-secondary;
-    }
+a {
+    text-decoration: none;
 }
 
 .address-info {
     display: flex;
-    gap: rem2(3px);
     flex-flow: column nowrap;
+    gap: rem2(3px);
 
     @include sm {
         margin-bottom: rem2(30px);
@@ -106,10 +93,10 @@ a {
     }
 
     .address, .tel {
-        color: $bit-color-primary-main;
+        color: #3E5060;
 
         &:hover {
-            color: $bit-color-action-hover-primary;
+            color: #4A5AAB;
         }
     }
 
@@ -126,19 +113,58 @@ a {
     }
 }
 
-.copy-right-txt {
+.links-container {
+    gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.column {
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+}
+
+.col-title {
+    margin: 0;
+    color: #1A2027;
     line-height: 1.5;
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: 0;
     font-size: rem2(14px);
+}
+
+.footer-link {
+    margin-top: rem2(10px);
+    color: #3E5060;
+    font-size: rem2(14px);
+    line-height: 1.5;
+    letter-spacing: 0;
+    font-weight: 400;
+    text-decoration: none;
+
+    &:hover {
+        color: #007FFF;
+        text-decoration: underline;
+    }
+}
+
+.copy-right-txt {
+    font-size: rem2(14px);
+    line-height: 1.5;
+    letter-spacing: 0;
+    font-weight: 400;
+    color: #3E5060;
     margin-top: rem2(16px);
 }
 
 .social-link-group {
     display: flex;
-    align-items: center;
     flex-flow: row nowrap;
     justify-content: center;
+    align-items: center;
 
     @include sm {
         margin-bottom: rem2(8px);

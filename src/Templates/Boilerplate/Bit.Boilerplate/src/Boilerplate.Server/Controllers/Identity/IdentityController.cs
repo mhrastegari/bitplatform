@@ -1,16 +1,15 @@
-﻿//+:cnd:noEmit
-using System.Text;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Authentication.BearerToken;
-using FluentEmail.Core;
-using Boilerplate.Server.Services;
-using Boilerplate.Server.Resources;
+﻿//-:cnd:noEmit
+using System.Web;
+using Boilerplate.Client.Core.Controllers.Identity;
 using Boilerplate.Server.Components;
-using Boilerplate.Shared.Dtos.Identity;
 using Boilerplate.Server.Models.Emailing;
 using Boilerplate.Server.Models.Identity;
-using Boilerplate.Client.Core.Controllers.Identity;
+using Boilerplate.Server.Resources;
+using Boilerplate.Shared.Dtos.Identity;
+using FluentEmail.Core;
+using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Boilerplate.Server.Controllers.Identity;
 
@@ -28,11 +27,9 @@ public partial class IdentityController : AppControllerBase, IIdentityController
 
     [AutoInject] private HtmlRenderer htmlRenderer = default!;
 
-    [AutoInject] private IOptionsMonitor<BearerTokenOptions> bearerTokenOptions = default!;
+    [AutoInject] private IStringLocalizer<IdentityStrings> identityLocalizer = default!;
 
-    //#if (captcha == "reCaptcha")
-    [AutoInject] private GoogleRecaptchaHttpClient googleRecaptchaHttpClient = default!;
-    //#endif
+    [AutoInject] private IOptionsMonitor<BearerTokenOptions> bearerTokenOptions = default!;
 
     /// <summary>
     /// By leveraging summary tags in your controller's actions and DTO properties you can make your codes much easier to maintain.
@@ -41,11 +38,6 @@ public partial class IdentityController : AppControllerBase, IIdentityController
     [HttpPost]
     public async Task SignUp(SignUpRequestDto signUpRequest, CancellationToken cancellationToken)
     {
-        //#if (captcha == "reCaptcha")
-        if (await googleRecaptchaHttpClient.Verify(signUpRequest.GoogleRecaptchaResponse, cancellationToken) is false)
-            throw new BadRequestException(Localizer[nameof(AppStrings.InvalidGoogleRecaptchaResponse)]);
-        //#endif
-
         var existingUser = await userManager.FindByNameAsync(signUpRequest.Email!);
 
         var userToAdd = signUpRequest.Map();
@@ -80,8 +72,11 @@ public partial class IdentityController : AppControllerBase, IIdentityController
     [HttpPost]
     public async Task SendConfirmationEmail(SendConfirmationEmailRequestDto sendConfirmationEmailRequest, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByEmailAsync(sendConfirmationEmailRequest.Email!)
-            ?? throw new BadRequestException(Localizer[nameof(AppStrings.UserNameNotFound), sendConfirmationEmailRequest.Email!]);
+        var user = await userManager.FindByEmailAsync(sendConfirmationEmailRequest.Email!);
+
+        if (user is null)
+            throw new BadRequestException(Localizer.GetString(nameof(AppStrings.UserNameNotFound), sendConfirmationEmailRequest.Email!));
+
         if (await userManager.IsEmailConfirmedAsync(user))
             throw new BadRequestException(Localizer[nameof(AppStrings.EmailAlreadyConfirmed)]);
 
@@ -99,7 +94,7 @@ public partial class IdentityController : AppControllerBase, IIdentityController
 
         var controller = RouteData.Values["controller"]!.ToString();
 
-        var confirmationLink = new Uri(HttpContext.Request.GetBaseUrl(), $"email-confirmation?email={Uri.EscapeDataString(user.Email!)}&token={Uri.EscapeDataString(token)}");
+        var confirmationLink = new Uri(HttpContext.Request.GetBaseUrl(), $"email-confirmation?email={HttpUtility.UrlEncode(user.Email)}&token={HttpUtility.UrlEncode(token)}");
 
         var body = await htmlRenderer.Dispatcher.InvokeAsync(async () =>
         {
@@ -118,10 +113,10 @@ public partial class IdentityController : AppControllerBase, IIdentityController
         });
 
         var result = await fluentEmail
-                           .To(user.Email, user.DisplayName)
-                           .Subject(emailLocalizer[EmailStrings.ConfirmationEmailSubject])
-                           .Body(body, isHtml: true)
-                           .SendAsync(cancellationToken);
+            .To(user.Email, user.DisplayName)
+            .Subject(emailLocalizer[EmailStrings.ConfirmationEmailSubject])
+            .Body(body, isHtml: true)
+            .SendAsync(cancellationToken);
 
         user.ConfirmationEmailRequestedOn = DateTimeOffset.Now;
 
@@ -134,8 +129,11 @@ public partial class IdentityController : AppControllerBase, IIdentityController
     [HttpPost]
     public async Task ConfirmEmail(ConfirmEmailRequestDto body)
     {
-        var user = await userManager.FindByEmailAsync(body.Email!)
-            ?? throw new BadRequestException(Localizer.GetString(nameof(AppStrings.UserNameNotFound), body.Email!));
+        var user = await userManager.FindByEmailAsync(body.Email!);
+
+        if (user is null)
+            throw new BadRequestException(Localizer.GetString(nameof(AppStrings.UserNameNotFound), body.Email!));
+
         var emailConfirmed = user.EmailConfirmed;
 
         if (emailConfirmed is false)
@@ -147,7 +145,7 @@ public partial class IdentityController : AppControllerBase, IIdentityController
     }
 
     [HttpPost, ProducesResponseType<TokenResponseDto>(statusCode: 200)]
-    public async Task SignIn(SignInRequestDto signInRequest, CancellationToken cancellationToken)
+    public async Task SignIn(SignInRequestDto signInRequest)
     {
         signInManager.AuthenticationScheme = IdentityConstants.BearerScheme;
 
@@ -172,7 +170,7 @@ public partial class IdentityController : AppControllerBase, IIdentityController
         } */
 
         if (result.Succeeded is false)
-            throw new UnauthorizedException(Localizer[nameof(AppStrings.InvalidUsernameOrPassword)]);
+            throw new UnauthorizedException(Localizer.GetString(nameof(AppStrings.InvalidUsernameOrPassword)));
     }
 
     [HttpPost]
@@ -193,10 +191,13 @@ public partial class IdentityController : AppControllerBase, IIdentityController
     }
 
     [HttpPost]
-    public async Task SendResetPasswordEmail(SendResetPasswordEmailRequestDto sendResetPasswordEmailRequest, CancellationToken cancellationToken)
+    public async Task SendResetPasswordEmail(SendResetPasswordEmailRequestDto sendResetPasswordEmailRequest
+          , CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByEmailAsync(sendResetPasswordEmailRequest.Email!)
-                    ?? throw new BadRequestException(Localizer.GetString(nameof(AppStrings.UserNameNotFound), sendResetPasswordEmailRequest.Email!));
+        var user = await userManager.FindByEmailAsync(sendResetPasswordEmailRequest.Email!);
+
+        if (user is null)
+            throw new BadRequestException(Localizer.GetString(nameof(AppStrings.UserNameNotFound), sendResetPasswordEmailRequest.Email!));
 
         var resendDelay = (DateTimeOffset.Now - user.ResetPasswordEmailRequestedOn) - AppSettings.IdentitySettings.ResetPasswordEmailResendDelay;
 
@@ -205,7 +206,7 @@ public partial class IdentityController : AppControllerBase, IIdentityController
 
         var token = await userManager.GeneratePasswordResetTokenAsync(user);
 
-        var resetPasswordLink = new Uri(HttpContext.Request.GetBaseUrl(), $"reset-password?email={Uri.EscapeDataString(user.Email!)}&token={Uri.EscapeDataString(token)}");
+        var resetPasswordLink = new Uri(HttpContext.Request.GetBaseUrl(), $"reset-password?email={HttpUtility.UrlEncode(user.Email)}&token={HttpUtility.UrlEncode(token)}");
 
         var body = await htmlRenderer.Dispatcher.InvokeAsync(async () =>
         {
@@ -225,10 +226,10 @@ public partial class IdentityController : AppControllerBase, IIdentityController
         });
 
         var result = await fluentEmail
-                           .To(user.Email, user.DisplayName)
-                           .Subject(emailLocalizer[EmailStrings.ResetPasswordEmailSubject])
-                           .Body(body, isHtml: true)
-                           .SendAsync(cancellationToken);
+            .To(user.Email, user.DisplayName)
+            .Subject(emailLocalizer[EmailStrings.ResetPasswordEmailSubject])
+            .Body(body, isHtml: true)
+            .SendAsync(cancellationToken);
 
         user.ResetPasswordEmailRequestedOn = DateTimeOffset.Now;
 
@@ -241,8 +242,10 @@ public partial class IdentityController : AppControllerBase, IIdentityController
     [HttpPost]
     public async Task ResetPassword(ResetPasswordRequestDto resetPasswordRequest, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByEmailAsync(resetPasswordRequest.Email!)
-                    ?? throw new BadRequestException(Localizer.GetString(nameof(AppStrings.UserNameNotFound), resetPasswordRequest.Email!));
+        var user = await userManager.FindByEmailAsync(resetPasswordRequest.Email!);
+
+        if (user is null)
+            throw new BadRequestException(Localizer.GetString(nameof(AppStrings.UserNameNotFound), resetPasswordRequest.Email!));
 
         var result = await userManager.ResetPasswordAsync(user, resetPasswordRequest.Token!, resetPasswordRequest.Password!);
 

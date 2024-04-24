@@ -2,19 +2,18 @@
 
 public abstract partial class BitComponentBase : ComponentBase
 {
-    private BitDir? dir;
     private string? style;
     private string? @class;
     private bool isEnabled = true;
     private BitVisibility visibility;
-    private Guid _uniqueId = Guid.NewGuid();
 
+
+    private Guid _uniqueId = Guid.NewGuid();
 
 
     protected bool Rendered { get; private set; }
 
     protected string _Id => Id ?? _uniqueId.ToString();
-
 
 
     /// <summary>
@@ -26,11 +25,6 @@ public abstract partial class BitComponentBase : ComponentBase
     /// The ElementReference of the root element.
     /// </summary>
     public ElementReference RootElement { get; internal set; }
-
-
-
-    [CascadingParameter] protected BitDir? CascadingDir { get; set; }
-
 
 
     /// <summary>
@@ -50,22 +44,6 @@ public abstract partial class BitComponentBase : ComponentBase
             if (@class == value) return;
 
             @class = value;
-            ClassBuilder.Reset();
-        }
-    }
-
-    /// <summary>
-    /// Determines the component direction.
-    /// </summary>
-    [Parameter]
-    public BitDir? Dir
-    {
-        get => dir ?? CascadingDir;
-        set
-        {
-            if (dir == value) return;
-
-            dir = value;
             ClassBuilder.Reset();
         }
     }
@@ -138,11 +116,6 @@ public abstract partial class BitComponentBase : ComponentBase
         {
             switch (parameter.Key)
             {
-                case nameof(CascadingDir):
-                    CascadingDir = (BitDir?)parameter.Value;
-                    parametersDictionary.Remove(parameter.Key);
-                    break;
-
                 case nameof(AriaLabel):
                     AriaLabel = (string?)parameter.Value;
                     parametersDictionary.Remove(parameter.Key);
@@ -150,11 +123,6 @@ public abstract partial class BitComponentBase : ComponentBase
 
                 case nameof(Class):
                     Class = (string?)parameter.Value;
-                    parametersDictionary.Remove(parameter.Key);
-                    break;
-
-                case nameof(Dir):
-                    Dir = (BitDir?)parameter.Value;
                     parametersDictionary.Remove(parameter.Key);
                     break;
 
@@ -201,8 +169,7 @@ public abstract partial class BitComponentBase : ComponentBase
 
         ClassBuilder
               .Register(() => RootElementClass)
-              .Register(() => (IsEnabled ? string.Empty : "bit-dis"))
-              .Register(() => (Dir == BitDir.Rtl ? "bit-rtl" : string.Empty));
+              .Register(() => (IsEnabled ? string.Empty : "bit-dis"));
 
         RegisterCssClasses();
 

@@ -22,7 +22,7 @@ public partial class DashboardController : AppControllerBase, IDashboardControll
     }
 
     [HttpGet]
-    public IQueryable<ProductsCountPerCategoryResponseDto> GetProductsCountPerCategoryStats()
+    public async Task<IAsyncEnumerable<ProductsCountPerCategoryResponseDto>> GetProductsCountPerCategoryStats(CancellationToken cancellationToken)
     {
         return DbContext.Categories
             .Select(c => new ProductsCountPerCategoryResponseDto()
@@ -30,11 +30,11 @@ public partial class DashboardController : AppControllerBase, IDashboardControll
                 CategoryName = c.Name,
                 CategoryColor = c.Color,
                 ProductCount = c.Products!.Count()
-            });
+            }).AsAsyncEnumerable();
     }
 
     [HttpGet]
-    public IQueryable<ProductSaleStatResponseDto> GetProductsSalesStats()
+    public async Task<IAsyncEnumerable<ProductSaleStatResponseDto>> GetProductsSalesStats(CancellationToken cancellationToken)
     {
         Random rand = new Random();
         return DbContext.Products.Include(p => p.Category)
@@ -43,12 +43,12 @@ public partial class DashboardController : AppControllerBase, IDashboardControll
                  ProductName = p.Name,
                  CategoryColor = p.Category!.Color,
                  SaleAmount = rand.Next(1, 10) * p.Price
-             });
+             }).AsAsyncEnumerable();
     }
 
 
     [HttpGet]
-    public async Task<List<ProductPercentagePerCategoryResponseDto>> GetProductsPercentagePerCategoryStats(CancellationToken cancellationToken)
+    public async Task<ProductPercentagePerCategoryResponseDto[]> GetProductsPercentagePerCategoryStats(CancellationToken cancellationToken)
     {
         var productsTotalCount = await DbContext.Products.CountAsync(cancellationToken);
 
@@ -63,6 +63,6 @@ public partial class DashboardController : AppControllerBase, IDashboardControll
                  CategoryName = c!.Name,
                  CategoryColor = c.Color,
                  ProductPercentage = (float)decimal.Divide(c.Products!.Count(), productsTotalCount) * 100
-             }).ToListAsync(cancellationToken);
+             }).ToArrayAsync(cancellationToken);
     }
 }

@@ -1,4 +1,4 @@
-﻿self['bit-bswup.sw version'] = '8.8.1';
+﻿self['bit-bswup.sw version'] = '8.7.1';
 
 interface Window {
     clients: any
@@ -21,7 +21,6 @@ interface Window {
     isPassive: any
     disablePassiveFirstBoot: any
     enableIntegrityCheck: any
-    errorTolerance: any
     enableDiagnostics: any
     enableFetchDiagnostics: any
 }
@@ -298,38 +297,26 @@ async function createAssetsCache(ignoreProgressReport = false) {
         try {
             const responsePromise = fetch(request);
             return responsePromise.then(async response => {
-                try {
-                    if (!response.ok) {
-                        diag('*** addCache - !response.ok:', request);
-                        doReport(true);
-                        return Promise.reject(response);
-                    }
+                if (!response.ok) {
+                    diag('*** addCache - !response.ok:', request);
 
-                    const cacheUrl = createCacheUrl(asset);
-                    await newCache.put(cacheUrl, response.clone());
-
-                    doReport();
-
-                    return response;
-
-                } catch (err) {
-                    diag('*** addCache - put cache err:', err);
-                    doReport(true);
-                    return Promise.reject(err);
+                    return Promise.reject(response.statusText);
                 }
+
+                const cacheUrl = createCacheUrl(asset);
+                await newCache.put(cacheUrl, response.clone());
+
+                if (report) {
+                    const percent = (++current) / total * 100;
+                    sendMessage({ type: 'progress', data: { asset, percent, index: current } });
+                }
+
+                return response;
             });
         } catch (err) {
             diag('*** addCache - catch err:', err);
-            doReport(true);
+
             return Promise.reject(err);
-        }
-
-        function doReport(rejected = false) {
-            if (!report) return;
-            if (rejected && self.errorTolerance !== 'lax') return;
-
-            const percent = (++current) / total * 100;
-            sendMessage({ type: 'progress', data: { asset, percent, index: current } });
         }
     }
 }

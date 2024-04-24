@@ -465,11 +465,4 @@ private int paginationSelectedPage = 1;";
                Appearance=""BitAppearance.Standard""
                Classes=""@(new() { Root = ""custom-root"", Button = ""custom-button"" })"" />";
 
-    private readonly string example14RazorCode = @"
-<BitPagination Dir=""BitDir.Rtl"" Count=""4"" />
-
-<BitPagination Dir=""BitDir.Rtl"" Count=""4"" Appearance=""BitAppearance.Standard"" />
-
-<BitPagination Dir=""BitDir.Rtl"" Count=""4"" Appearance=""BitAppearance.Text"" />";
-
 }

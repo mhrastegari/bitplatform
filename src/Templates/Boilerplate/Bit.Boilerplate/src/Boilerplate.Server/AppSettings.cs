@@ -1,5 +1,4 @@
-﻿//+:cnd:noEmit
-namespace Boilerplate.Server;
+﻿namespace Boilerplate.Server;
 
 public class AppSettings
 {
@@ -10,10 +9,6 @@ public class AppSettings
     public HealthCheckSettings HealthCheckSettings { get; set; } = default!;
 
     public string UserProfileImagesDir { get; set; } = default!;
-
-    //#if (captcha == "reCaptcha")
-    public string GoogleRecaptchaSecretKey { get; set; } = default!;
-    //#endif
 }
 
 public class HealthCheckSettings

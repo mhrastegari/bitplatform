@@ -298,7 +298,4 @@ public BitRatingDemoFormModel ValidationModel = new();
 
 private void HandleValidSubmit() { }
 private void HandleInvalidSubmit() { }";
-
-    private readonly string example9RazorCode = @"
-<BitRating Dir=""BitDir.Rtl"" />";
 }

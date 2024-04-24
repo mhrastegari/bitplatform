@@ -4,7 +4,7 @@ using Boilerplate.Shared.Dtos.Todo;
 namespace Boilerplate.Client.Core.Components.Pages.Todo;
 
 [Authorize]
-public partial class TodoPage
+public partial class TodoPage : IDisposable
 {
     [AutoInject] Keyboard keyboard = default!;
     [AutoInject] ITodoItemController todoItemController = default!;
@@ -24,7 +24,7 @@ public partial class TodoPage
 
     protected override async Task OnInitAsync()
     {
-        _ = keyboard.Add(ButilKeyCodes.KeyF, () => _ = searchBox.FocusAsync(), ButilModifiers.Ctrl);
+        _ = keyboard.Add(ButilKeyCodes.KeyF, () => _ = searchBox.FocusInput(), ButilModifiers.Ctrl);
 
         selectedFilter = nameof(AppStrings.All);
         selectedSort = nameof(AppStrings.Alphabetical);
@@ -46,7 +46,7 @@ public partial class TodoPage
 
         try
         {
-            allTodoItems = await todoItemController.Get(CurrentCancellationToken);
+            allTodoItems = await (await todoItemController.Get(CurrentCancellationToken)).ToListAsync(CurrentCancellationToken);
 
             FilterViewTodoItems();
         }
@@ -193,13 +193,9 @@ public partial class TodoPage
         }
     }
 
-    protected override async ValueTask DisposeAsync(bool disposing)
+    public override void Dispose()
     {
-        await base.DisposeAsync(true);
-
-        if (disposing)
-        {
-            await keyboard.DisposeAsync();
-        }
+        keyboard.Dispose();
+        base.Dispose();
     }
 }

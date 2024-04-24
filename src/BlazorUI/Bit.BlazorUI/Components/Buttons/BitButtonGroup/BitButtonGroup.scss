@@ -1,7 +1,6 @@
 ﻿@import "../../../Styles/functions.scss";
 
 .bit-btg {
-    overflow: hidden;
     flex-direction: row;
     display: inline-flex;
     max-width: fit-content;
@@ -54,13 +53,20 @@
     padding: spacing(0.7) spacing(2);
     font-family: $typography-font-family;
     font-weight: $typography-font-weight;
-    border-block-end-width: 0;
-    border-block-start-width: 0;
-    border-inline-start-width: 0;
+    border-top-width: 0;
+    border-left-width: 0;
+    border-bottom-width: 0;
+}
+
+.bit-btg-ift {
+    border-top-left-radius: $shape-border-radius;
+    border-bottom-left-radius: $shape-border-radius;
 }
 
 .bit-btg-ilt {
-    border-inline-end-width: 0;
+    border-right-width: 0;
+    border-top-right-radius: $shape-border-radius;
+    border-bottom-right-radius: $shape-border-radius;
 }
 
 .bit-btg-ipr {
@@ -214,13 +220,20 @@
 
     .bit-btg-itm {
         border-width: $shape-border-width;
-        border-block-start-width: 0;
-        border-inline-start-width: 0;
-        border-inline-end-width: 0;
+        border-top-width: 0;
+        border-left-width: 0;
+        border-right-width: 0;
+    }
+
+    .bit-btg-ift {
+        border-top-left-radius: $shape-border-radius;
+        border-top-right-radius: $shape-border-radius;
     }
 
     .bit-btg-ilt {
-        border-block-end-width: 0;
+        border-bottom-width: 0;
+        border-bottom-left-radius: $shape-border-radius;
+        border-bottom-right-radius: $shape-border-radius;
     }
 }
 

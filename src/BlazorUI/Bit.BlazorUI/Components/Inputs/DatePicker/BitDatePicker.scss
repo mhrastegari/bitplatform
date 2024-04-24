@@ -61,7 +61,6 @@
 .bit-dtp-icn {
     margin: 0;
     display: flex;
-    gap: spacing(1);
     cursor: pointer;
     box-shadow: none;
     height: spacing(4);
@@ -76,34 +75,10 @@
 }
 
 .bit-dtp-ico {
-    padding: 0;
     cursor: pointer;
+    padding-right: 0;
+    padding-left: spacing(1);
     color: $color-foreground-secondary;
-}
-
-.bit-dtp-clr {
-    display: flex;
-    width: spacing(3.75);
-    height: spacing(3.75);
-    justify-content: center;
-    align-items: center;
-    background-color: $color-background-secondary;
-    cursor: pointer;
-
-    i {
-        speak: none;
-        width: unset;
-        pointer-events: none;
-        display: inline-block;
-        font-size: spacing(1.5);
-        color: $color-foreground-secondary;
-    }
-
-    @media (hover: hover) {
-        &:hover {
-            background-color: $color-action-hover-background-primary;
-        }
-    }
 }
 
 .bit-dtp-inp {
@@ -406,7 +381,7 @@
     padding: spacing(0.375) 0 0 0;
     color: $color-foreground-secondary;
     background-color: $color-background-secondary;
-    border-inline-end: $shape-border-width $shape-border-style $color-border-secondary;
+    border-right: $shape-border-width $shape-border-style $color-border-secondary;
 }
 
 .bit-dtp-pkh {
@@ -428,15 +403,14 @@
     flex-grow: 1;
     cursor: text;
     overflow: hidden;
+    text-align: left;
     font-weight: 600;
-    text-align: start;
     position: relative;
     white-space: nowrap;
     align-items: center;
     outline: transparent;
     display: inline-block;
     text-overflow: ellipsis;
-    padding: 0 spacing(1.25);
     font-size: spacing(1.75);
     line-height: spacing(3.5);
     animation-fill-mode: both;
@@ -445,6 +419,7 @@
     background-color: transparent;
     color: $color-foreground-primary;
     border-radius: $shape-border-radius;
+    padding: 0 spacing(0.5) 0 spacing(1.25);
     animation-timing-function: cubic-bezier(0.1, 0.25, 0.75, 0.9);
 }
 
@@ -498,8 +473,7 @@
         pointer-events: none;
         background-color: transparent;
 
-        .bit-dtp-gti,
-        .bit-icon {
+        .bit-dtp-gti {
             color: $color-foreground-disabled;
         }
     }
@@ -642,16 +616,15 @@
 
 .bit-dtp-tic {
     margin: 0;
-    flex: 0.85;
+    padding: spacing(2);
     display: flex;
     outline: none;
-    direction: ltr;
-    gap: spacing(1);
     box-shadow: none;
-    padding: spacing(2);
-    align-items: center;
     box-sizing: border-box;
+    align-items: center;
     justify-content: center;
+    flex: 0.85;
+    gap: spacing(1);
 }
 
 .bit-dtp-tpr {
@@ -771,5 +744,26 @@
 .bit-dtp-nbd {
     .bit-dtp-icn {
         border: none;
+    }
+}
+
+.bit-dtp-rtl {
+    .bit-dtp-grp {
+        direction: rtl;
+    }
+
+    .bit-dtp-wnm {
+        border-right: none;
+        border-left: $shape-border-width $shape-border-style $color-border-secondary;
+    }
+
+    .bit-dtp-pkt,
+    .bit-dtp-ptb {
+        text-align: right;
+        padding: 0 spacing(1.25) 0 spacing(0.5);
+    }
+
+    .bit-dtp-twp {
+        flex-direction: row-reverse;
     }
 }

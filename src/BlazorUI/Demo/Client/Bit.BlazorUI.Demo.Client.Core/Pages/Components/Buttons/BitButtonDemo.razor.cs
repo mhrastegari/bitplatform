@@ -116,10 +116,10 @@ public partial class BitButtonDemo
         {
             Name = "LoadingLabelPosition",
             Type = "BitLabelPosition",
-            DefaultValue = "BitLabelPosition.End",
+            DefaultValue = "BitLabelPosition.Right",
             Description = "The position of the loading Label in regards to the spinner animation.",
             LinkType = LinkType.Link,
-            Href = "#button-labelPosition-enum"
+            Href = "#spinner-position-enum"
         },
         new()
         {
@@ -310,39 +310,6 @@ public partial class BitButtonDemo
                     Value="1",
                 }
             }
-        },
-        new()
-        {
-            Id = "button-labelPosition-enum",
-            Name = "BitLabelPosition",
-            Description = "",
-            Items = new()
-            {
-                new()
-                {
-                    Name= "Top",
-                    Description="The label shows on the top of the button.",
-                    Value="0",
-                },
-                new()
-                {
-                    Name= "End",
-                    Description="The label shows on the end of the button.",
-                    Value="1",
-                },
-                new()
-                {
-                    Name= "Bottom",
-                    Description="The label shows on the bottom of the button.",
-                    Value="2",
-                },
-                new()
-                {
-                    Name= "Start",
-                    Description="The label shows on the start of the button.",
-                    Value="3",
-                },
-            }
         }
     };
 
@@ -430,7 +397,7 @@ public partial class BitButtonDemo
 <BitButton OnClick=""() => clickCounter++"">Click me (@clickCounter)</BitButton>";
     private readonly string example6CsharpCode = @"
 private int clickCounter;";
-
+    
     private readonly string example7RazorCode = @"
 <BitButton Color=""BitColor.Info"">Info</BitButton>
 <BitButton Color=""BitColor.Info"" ButtonStyle=""BitButtonStyle.Standard"">Info</BitButton>
@@ -451,7 +418,7 @@ private int clickCounter;";
 <BitButton Color=""BitColor.Error"">Error</BitButton>
 <BitButton Color=""BitColor.Error"" ButtonStyle=""BitButtonStyle.Standard"">Error</BitButton>
 <BitButton Color=""BitColor.Error"" ButtonStyle=""BitButtonStyle.Text"">Error</BitButton>";
-
+    
     private readonly string example8RazorCode = @"
 <BitButton Size=""BitButtonSize.Small"" ButtonStyle=""BitButtonStyle.Primary"">Small</BitButton>
 <BitButton Size=""BitButtonSize.Medium"" ButtonStyle=""BitButtonStyle.Primary"">Medium</BitButton>
@@ -589,19 +556,19 @@ private async Task LoadingTextClick()
 
     private readonly string example12RazorCode = @"
 <BitButton IsLoading=""true""
-           LoadingLabel=""End...""
+           LoadingLabel=""Right...""
            Style=""min-width: 6.5rem;""
            ButtonStyle=""BitButtonStyle.Standard""
-           LoadingLabelPosition=""BitLabelPosition.End"">
-    End
+           LoadingLabelPosition=""BitLabelPosition.Right"">
+    Right
 </BitButton>
 
 <BitButton IsLoading=""true""
-           LoadingLabel=""Start...""
+           LoadingLabel=""Left...""
            Style=""min-width: 6.5rem;""
-           ButtonStyle=""BitButtonStyle.Standard""
-           LoadingLabelPosition=""BitLabelPosition.Start"">
-    Start
+           LoadingLabelPosition=""BitLabelPosition.Left""
+           ButtonStyle=""BitButtonStyle.Standard"">
+    Left
 </BitButton>
 
 <BitButton IsLoading=""true""
@@ -700,7 +667,6 @@ private async Task LoadingTextClick()
                               Spinner = ""custom-spinner"" })"">
     Standard
 </BitButton>";
-
     private readonly string example14CsharpCode = @"
 private bool stylesIsLoading;
 private bool classesIsLoading;
@@ -718,40 +684,4 @@ private async Task LoadingClassesClick()
     await Task.Delay(3000);
     classesIsLoading = false;
 }";
-
-    private readonly string example15RazorCode = @"
-<BitButton Dir=""BitDir.Rtl""
-           IconName=""@BitIconName.Emoji""
-           ButtonStyle=""BitButtonStyle.Primary"">
-    دکمه با نماد
-</BitButton>
-
-<BitButton Dir=""BitDir.Rtl""
-           IconName=""@BitIconName.Emoji""
-           ButtonStyle=""BitButtonStyle.Standard"">
-    دکمه با نماد
-</BitButton>
-
-<BitButton Dir=""BitDir.Rtl""
-           IconName=""@BitIconName.Emoji""
-           ButtonStyle=""BitButtonStyle.Text"">
-    دکمه با نماد
-</BitButton>
-
-
-<BitButton IsLoading
-           Dir=""BitDir.Rtl""
-           LoadingLabel=""دکمه ی بارگذاری""
-           ButtonStyle=""BitButtonStyle.Primary"" />
-
-<BitButton IsLoading
-           Dir=""BitDir.Rtl""
-           LoadingLabel=""دکمه ی بارگذاری""
-           ButtonStyle=""BitButtonStyle.Standard"" />
-
-<BitButton IsLoading
-           Dir=""BitDir.Rtl""
-           LoadingLabel=""دکمه ی بارگذاری""
-           ButtonStyle=""BitButtonStyle.Text"" />
-";
 }

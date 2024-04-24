@@ -6,7 +6,8 @@
 
 <ComponentDemo ComponentName="Carousel"
                ComponentDescription="Carousel (Carousel slide-show) let people show their items in seperate slides from two or more items."
-               ComponentParameters="componentParameters">
+               ComponentParameters="componentParameters"
+               ComponentSubEnums="componentSubEnums">
     <ComponentExampleBox Title="Basic Carousel" RazorCode="@example1RazorCode" Id="example1">
         <ExamplePreview>
             <div>
@@ -131,7 +132,7 @@
                 </div>
                 <div class="goto-container">
                     <BitButton Class="goto-button" OnClick="GoTo">GoTo</BitButton>
-                    <BitNumberField @bind-Value="index" />
+                    <BitNumericTextField @bind-Value="index"></BitNumericTextField>
                 </div>
             </div>
         </ExamplePreview>
@@ -189,7 +190,7 @@
     <ComponentExampleBox Title="RTL" RazorCode="@example7RazorCode" Id="example7">
         <ExamplePreview>
             <div>
-                <BitCarousel Style="height: 100px" Dir="BitDir.Rtl" VisibleItemsCount="3" ScrollItemsCount="1" InfiniteScrolling="true">
+                <BitCarousel Style="height: 100px" Direction="BitDirection.RightToLeft" VisibleItemsCount="3" ScrollItemsCount="1" InfiniteScrolling="true">
                     <BitCarouselItem Class="item"><div>یک</div></BitCarouselItem>
                     <BitCarouselItem Class="item"><div>دو</div></BitCarouselItem>
                     <BitCarouselItem Class="item"><div>سه</div></BitCarouselItem>
@@ -208,7 +209,7 @@
 
 @code {
     private int index;
-    private BitCarousel carousel = default!;
+    private BitCarousel carousel;
 
     private void GoNext()
     {

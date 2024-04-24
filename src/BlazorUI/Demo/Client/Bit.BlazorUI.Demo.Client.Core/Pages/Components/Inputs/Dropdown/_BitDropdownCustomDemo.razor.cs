@@ -6,7 +6,7 @@ public partial class _BitDropdownCustomDemo
     [Inject] private NavigationManager NavManager { get; set; } = default!;
 
 
-    private BitDropdownNameSelectors<BitDropdownCustom, string> nameSelectors = new()
+    private BitDropdownNameSelectors<BitDropdownCustom, string?> nameSelectors = new() 
     {
         AriaLabel = { Selector = c => c.Label },
         Class = { Selector = c => c.CssClass },
@@ -14,6 +14,7 @@ public partial class _BitDropdownCustomDemo
         Data = { Selector = c => c.Payload },
         IsEnabled = { Selector = c => c.Disabled is false },
         IsHidden = { Selector = c => c.Visible is false },
+        IsSelected = { Name = nameof(BitDropdownCustom.IsSelected) },
         ItemType = { Selector = c => c.Type },
         Style = { Selector = c => c.CssStyle },
         Text = { Selector = c => c.Text },
@@ -21,26 +22,9 @@ public partial class _BitDropdownCustomDemo
         Value = { Selector = c => c.Value },
     };
 
-    private BitDropdownNameSelectors<BitDropdownCustom, string> comboBoxNameSelectors = new()
+
+    private List<BitDropdownCustom> GetBasicCustoms() => new()
     {
-        AriaLabel = { Selector = c => c.Label },
-        Class = { Selector = c => c.CssClass },
-        Id = { Selector = c => c.Key },
-        Data = { Selector = c => c.Payload },
-        IsEnabled = { Selector = c => c.Disabled is false },
-        IsHidden = { Selector = c => c.Visible is false },
-        ItemType = { Selector = c => c.Type },
-        Style = { Selector = c => c.CssStyle },
-        Text = { Selector = c => c.Text },
-        Title = { Selector = c => c.Title },
-        Value = { Selector = c => c.Value },
-        ValueSetter = (BitDropdownCustom item, string value) => item.Value = value,
-        TextSetter = (string text, BitDropdownCustom item) => item.Text = text
-    };
-
-
-    private List<BitDropdownCustom> GetBasicCustoms() =>
-    [
         new() { Text = "Fruits", Type = BitDropdownItemType.Header },
         new() { Text = "Apple", Value = "f-app" },
         new() { Text = "Banana", Value = "f-ban" },
@@ -51,10 +35,9 @@ public partial class _BitDropdownCustomDemo
         new() { Text = "Broccoli", Value = "v-bro" },
         new() { Text = "Carrot", Value = "v-car" },
         new() { Text = "Lettuce", Value = "v-let" }
-    ];
-
-    private List<BitDropdownCustom> GetDataCustoms() =>
-    [
+    };
+    private List<BitDropdownCustom> GetDataCustoms() => new()
+    {
         new() { Type = BitDropdownItemType.Header, Text = "Items" },
         new() { Text = "Item a", Value = "A", Payload = new DropdownItemData { IconName = "Memo" } },
         new() { Text = "Item b", Value = "B", Payload = new DropdownItemData { IconName = "Print" } },
@@ -64,13 +47,11 @@ public partial class _BitDropdownCustomDemo
         new() { Text = "Item d", Value = "D", Payload = new DropdownItemData { IconName = "Train" } },
         new() { Text = "Item e", Value = "E", Payload = new DropdownItemData { IconName = "Repair" } },
         new() { Text = "Item f", Value = "F", Payload = new DropdownItemData { IconName = "Running" } }
-    ];
-
+    };
     private ICollection<BitDropdownCustom>? virtualizeCustoms1;
     private ICollection<BitDropdownCustom>? virtualizeCustoms2;
-
-    private List<BitDropdownCustom> GetRtlCustoms() =>
-    [
+    private List<BitDropdownCustom> GetRtlCustoms() => new()
+    {
         new() { Type = BitDropdownItemType.Header, Text = "میوه ها" },
         new() { Text = "سیب", Value = "f-app" },
         new() { Text = "موز", Value = "f-ban" },
@@ -81,7 +62,7 @@ public partial class _BitDropdownCustomDemo
         new() { Text = "کلم بروكلی", Value = "v-bro" },
         new() { Text = "هویج", Value = "v-car" },
         new() { Text = "کاهو", Value = "v-let" }
-    ];
+    };
     private ICollection<BitDropdownCustom>? dropDirectionCustoms;
     private List<BitDropdownCustom> GetStyleClassCustoms() => new()
     {
@@ -96,24 +77,11 @@ public partial class _BitDropdownCustomDemo
         new() { Text = "Carrot", Value = "v-car", CssClass = "custom-veg" },
         new() { Text = "Lettuce", Value = "v-let", CssClass = "custom-veg" }
     };
-    private List<BitDropdownCustom> comboBoxCustoms = new()
-    {
-        new() { Text = "Fruits", Type = BitDropdownItemType.Header },
-        new() { Text = "Apple", Value = "f-app" },
-        new() { Text = "Banana", Value = "f-ban" },
-        new() { Text = "Orange", Value = "f-ora", Disabled = true },
-        new() { Text = "Grape", Value = "f-gra" },
-        new() { Type = BitDropdownItemType.Divider },
-        new() { Text = "Vegetables", Type = BitDropdownItemType.Header },
-        new() { Text = "Broccoli", Value = "v-bro" },
-        new() { Text = "Carrot", Value = "v-car" },
-        new() { Text = "Lettuce", Value = "v-let" }
-    };
 
 
 
-    private string controlledValue = "f-app";
-    private ICollection<string> controlledValues = ["f-app", "f-ban"];
+    private string? controlledValue = "f-app";
+    private ICollection<string?> controlledValues = new[] { "f-app", "f-ban" };
 
     private BitDropdownCustom? changedItem;
     private BitDropdownCustom[] changedItems = Array.Empty<BitDropdownCustom>();
@@ -121,17 +89,12 @@ public partial class _BitDropdownCustomDemo
     private BitDropdownCustom? selectedItem1;
     private BitDropdownCustom? selectedItem2;
 
-    private string clearValue = "f-app";
-    private ICollection<string> clearValues = ["f-app", "f-ban"];
+    private string? clearValue = "f-app";
+    private ICollection<string?> clearValues = new[] { "f-app", "f-ban" };
 
     private string successMessage = string.Empty;
     private FormValidationDropdownModel validationModel = new();
 
-    private string comboBoxValueSample1 = default!;
-    private string comboBoxValueSample2 = default!;
-    private string comboBoxValueSample3 = default!;
-    private string comboBoxValueSample4 = default!;
-    private ICollection<string> comboBoxValues = [];
 
     protected override void OnInitialized()
     {
@@ -165,11 +128,6 @@ public partial class _BitDropdownCustomDemo
         successMessage = string.Empty;
     }
 
-    private void HandleOnDynamicAdd(BitDropdownCustom item)
-    {
-        comboBoxCustoms.Add(item);
-    }
-
     private async ValueTask<BitDropdownItemsProviderResult<BitDropdownCustom>> LoadItems(
         BitDropdownItemsProviderRequest<BitDropdownCustom> request)
     {
@@ -192,7 +150,7 @@ public partial class _BitDropdownCustomDemo
 
             var data = await HttpClient.GetFromJsonAsync(url, AppJsonContext.Default.PagedResultProductDto);
 
-            var items = data!.Items!.Select(i => new BitDropdownCustom
+            var items = data!.Items.Select(i => new BitDropdownCustom
             {
                 Text = i.Name,
                 Value = i.Id.ToString(),

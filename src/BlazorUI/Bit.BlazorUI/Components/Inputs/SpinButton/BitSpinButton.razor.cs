@@ -9,18 +9,18 @@ public partial class BitSpinButton
     private const int INITIAL_STEP_DELAY = 400;
     private const int STEP_DELAY = 75;
 
-    private BitLabelPosition labelPosition = BitLabelPosition.Top;
+    private BitSpinButtonLabelPosition labelPosition = BitSpinButtonLabelPosition.Top;
 
     private double _min;
     private double _max;
     private int _precision;
+    private Timer? _pointerDownTimer;
     private string? _intermediateValue;
     private string _inputId = default!;
 
     private ElementReference _inputRef;
     private ElementReference _incrementBtnRef;
     private ElementReference _decrementBtnRef;
-    private CancellationTokenSource _cancellationTokenSource = new();
 
     [Inject] private IJSRuntime _js { get; set; } = default!;
 
@@ -113,7 +113,7 @@ public partial class BitSpinButton
     /// The position of the label in regards to the spin button.
     /// </summary>
     [Parameter]
-    public BitLabelPosition LabelPosition
+    public BitSpinButtonLabelPosition LabelPosition
     {
         get => labelPosition;
         set
@@ -207,18 +207,6 @@ public partial class BitSpinButton
 
 
 
-    /// <summary>
-    /// The ElementReference to the input element of the BitSpinButton.
-    /// </summary>
-    public ElementReference? InputElement => ShowInput ? _inputRef : null;
-
-    /// <summary>
-    /// Gives focus to the input element of the BitSpinButton.
-    /// </summary>
-    public ValueTask FocusAsync() => ShowInput ? _inputRef.FocusAsync() : ValueTask.CompletedTask;
-
-
-
     protected override string RootElementClass => "bit-spb";
 
     protected override void RegisterCssClasses()
@@ -227,9 +215,9 @@ public partial class BitSpinButton
 
         ClassBuilder.Register(() => LabelPosition switch
         {
-            BitLabelPosition.Bottom => $"{RootElementClass}-lbt",
-            BitLabelPosition.Start => $"{RootElementClass}-lst",
-            BitLabelPosition.End => $"{RootElementClass}-led",
+            BitSpinButtonLabelPosition.Bottom => $"{RootElementClass}-lbt",
+            BitSpinButtonLabelPosition.Left => $"{RootElementClass}-llf",
+            BitSpinButtonLabelPosition.Right => $"{RootElementClass}-lrt",
             _ => $"{RootElementClass}-ltp"
         });
     }
@@ -277,21 +265,22 @@ public partial class BitSpinButton
     }
 
 
-
-    private async Task ApplyValueChange(bool isIncrement)
+    private async Task ApplyValueChange(BitSpinButtonAction action)
     {
         double result = 0;
         bool isValid = false;
 
-        if (isIncrement)
+        switch (action)
         {
-            result = CurrentValue + Step;
-            isValid = result <= _max && result >= _min;
-        }
-        else
-        {
-            result = CurrentValue - Step;
-            isValid = result <= _max && result >= _min;
+            case BitSpinButtonAction.Increment:
+                result = CurrentValue + Step;
+                isValid = result <= _max && result >= _min;
+                break;
+
+            case BitSpinButtonAction.Decrement:
+                result = CurrentValue - Step;
+                isValid = result <= _max && result >= _min;
+                break;
         }
 
         if (isValid is false) return;
@@ -303,13 +292,10 @@ public partial class BitSpinButton
         StateHasChanged();
     }
 
-    private async Task HandleOnPointerDown(bool isIncrement)
+    private async Task HandleOnPointerDown(BitSpinButtonAction action, MouseEventArgs e)
     {
-        if (IsEnabled is false) return;
-        if (ValueHasBeenSet && ValueChanged.HasDelegate is false) return;
-
-        //Change focus from input to number field
-        if (isIncrement)
+        //Change focus from input to spin button
+        if (action == BitSpinButtonAction.Increment)
         {
             await _incrementBtnRef.FocusAsync();
         }
@@ -318,57 +304,19 @@ public partial class BitSpinButton
             await _decrementBtnRef.FocusAsync();
         }
 
-        await ChangeValue(isIncrement);
-        ResetCts();
+        await HandlePointerDownAction(action, e);
 
-        var cts = _cancellationTokenSource;
-        await Task.Run(async () =>
+        _pointerDownTimer = new Timer(async (_) =>
         {
             await InvokeAsync(async () =>
             {
-                await Task.Delay(INITIAL_STEP_DELAY);
-                await ContinuousChangeValue(isIncrement, cts);
+                await HandlePointerDownAction(action, e);
+                StateHasChanged();
             });
-        }, cts.Token);
+        }, null, INITIAL_STEP_DELAY, STEP_DELAY);
     }
 
-    private async Task ContinuousChangeValue(bool isIncrement, CancellationTokenSource cts)
-    {
-        if (cts.IsCancellationRequested) return;
-
-        await ChangeValue(isIncrement);
-
-        StateHasChanged();
-
-        await Task.Delay(STEP_DELAY);
-        await ContinuousChangeValue(isIncrement, cts);
-    }
-
-    private async Task ChangeValue(bool isIncrement)
-    {
-        await ApplyValueChange(isIncrement);
-        if (isIncrement && OnIncrement.HasDelegate)
-        {
-            await OnIncrement.InvokeAsync(CurrentValue);
-        }
-
-        if (isIncrement is false && OnDecrement.HasDelegate)
-        {
-            await OnDecrement.InvokeAsync(CurrentValue);
-        }
-    }
-
-    private void HandleOnPointerUpOrOut()
-    {
-        ResetCts();
-    }
-
-    private void ResetCts()
-    {
-        _cancellationTokenSource.Cancel();
-        _cancellationTokenSource.Dispose();
-        _cancellationTokenSource = new();
-    }
+    private void HandleOnPointerUpOrOut() => _pointerDownTimer?.Dispose();
 
     private void HandleOnChange(ChangeEventArgs e)
     {
@@ -377,6 +325,24 @@ public partial class BitSpinButton
         if (ValueHasBeenSet && ValueChanged.HasDelegate is false) return;
 
         _intermediateValue = GetCleanValue(e.Value?.ToString());
+    }
+
+    private async Task HandlePointerDownAction(BitSpinButtonAction action, MouseEventArgs e)
+    {
+        if (IsEnabled is false) return;
+        if (ValueHasBeenSet && ValueChanged.HasDelegate is false) return;
+
+        await ApplyValueChange(action);
+
+        if (action is BitSpinButtonAction.Increment && OnIncrement.HasDelegate is true)
+        {
+            await OnIncrement.InvokeAsync(CurrentValue);
+        }
+
+        if (action is BitSpinButtonAction.Decrement && OnDecrement.HasDelegate is true)
+        {
+            await OnDecrement.InvokeAsync(CurrentValue);
+        }
     }
 
     private async Task HandleOnKeyDown(KeyboardEventArgs e)
@@ -390,7 +356,7 @@ public partial class BitSpinButton
             case "ArrowUp":
                 {
                     await CheckIntermediateValueAndSetValue();
-                    await ApplyValueChange(true);
+                    await ApplyValueChange(BitSpinButtonAction.Increment);
 
                     if (OnIncrement.HasDelegate is true)
                     {
@@ -403,7 +369,7 @@ public partial class BitSpinButton
             case "ArrowDown":
                 {
                     await CheckIntermediateValueAndSetValue();
-                    await ApplyValueChange(false);
+                    await ApplyValueChange(BitSpinButtonAction.Decrement);
 
                     if (OnDecrement.HasDelegate is true)
                     {
@@ -560,7 +526,7 @@ public partial class BitSpinButton
     {
         if (disposing)
         {
-            _cancellationTokenSource.Dispose();
+            _pointerDownTimer?.Dispose();
         }
 
         base.Dispose(disposing);

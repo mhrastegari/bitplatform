@@ -57,9 +57,7 @@ public class BitAccordionTests : BunitTestContext
     {
         var com = RenderComponent<BitAccordion>();
 
-        var root = com.Find(".bit-acd");
         var header = com.Find(".bit-acd-hdr");
-
         var icon = com.Find(".bit-acd-hdr > i");
         var content = com.Find(".bit-acd-con");
         header.Click();
@@ -67,7 +65,6 @@ public class BitAccordionTests : BunitTestContext
         Assert.IsTrue(icon.ClassName.Contains("bit-acd-hex"));
         Assert.IsTrue(content.ClassName.Contains("bit-acd-cex"));
     }
-
 
     [DataTestMethod,
         DataRow(true),

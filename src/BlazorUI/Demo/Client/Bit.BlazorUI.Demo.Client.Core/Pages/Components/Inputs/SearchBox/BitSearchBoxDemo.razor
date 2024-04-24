@@ -9,8 +9,7 @@
     <ComponentDemo ComponentName="SearchBox"
                    ComponentDescription="A search box (SearchBox) provides an input field for searching content within a site or app to find specific items."
                    ComponentParameters="componentParameters"
-                   ComponentSubClasses="componentSubClasses"
-                   ComponentPublicMembers="componentPublicMembers">
+                   ComponentSubClasses="componentSubClasses">
         <ComponentExampleBox Title="Basic" RazorCode="@example1RazorCode" Id="example1">
             <ExamplePreview>
                 <div class="example-content">
@@ -204,20 +203,6 @@
                                       @bind-Value="@ItemsProviderSearchValue" />
                         SearchValue: @ItemsProviderSearchValue
                     </div>
-                </div>
-            </ExamplePreview>
-        </ComponentExampleBox>
-
-        <ComponentExampleBox Title="RTL" RazorCode="@example10RazorCode" Id="example10">
-            <ExamplePreview>
-                <div class="example-content">
-                    <BitSearchBox Dir="BitDir.Rtl" Placeholder="جستجو" />
-                    <br />
-                    <BitSearchBox IsUnderlined Dir="BitDir.Rtl" Placeholder="جستجو" />
-                    <br />
-                    <BitSearchBox ShowSearchButton
-                                  Dir="BitDir.Rtl"
-                                  Placeholder="جستجو" />
                 </div>
             </ExamplePreview>
         </ComponentExampleBox>

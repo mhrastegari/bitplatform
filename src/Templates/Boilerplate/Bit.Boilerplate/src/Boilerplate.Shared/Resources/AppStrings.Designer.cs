@@ -61,15 +61,6 @@ namespace Boilerplate.Shared.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to About.
-        /// </summary>
-        public static string AboutTitle {
-            get {
-                return ResourceManager.GetString("AboutTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Action.
         /// </summary>
         public static string Action {
@@ -142,7 +133,7 @@ namespace Boilerplate.Shared.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to delete {0}?.
+        ///   Looks up a localized string similar to Are you sure you want to delete {0}.
         /// </summary>
         public static string AreYouSureWannaDelete {
             get {
@@ -710,24 +701,6 @@ namespace Boilerplate.Shared.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You need to pass the Google reCAPTCHA challenge..
-        /// </summary>
-        public static string InvalidGoogleRecaptchaChallenge {
-            get {
-                return ResourceManager.GetString("InvalidGoogleRecaptchaChallenge", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid Google reCAPTCHA response..
-        /// </summary>
-        public static string InvalidGoogleRecaptchaResponse {
-            get {
-                return ResourceManager.GetString("InvalidGoogleRecaptchaResponse", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Invalid username or password.
         /// </summary>
         public static string InvalidUsernameOrPassword {
@@ -791,29 +764,11 @@ namespace Boilerplate.Shared.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to New version is available.
-        /// </summary>
-        public static string NewVersionIsAvailable {
-            get {
-                return ResourceManager.GetString("NewVersionIsAvailable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to No.
         /// </summary>
         public static string No {
             get {
                 return ResourceManager.GetString("No", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to There is nothing here..
-        /// </summary>
-        public static string NotFoundText {
-            get {
-                return ResourceManager.GetString("NotFoundText", resourceCulture);
             }
         }
         
@@ -1354,15 +1309,6 @@ namespace Boilerplate.Shared.Resources {
         public static string UpdateConcurrencyException {
             get {
                 return ResourceManager.GetString("UpdateConcurrencyException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Would you like to update to the new version?.
-        /// </summary>
-        public static string UpdateToNewVersion {
-            get {
-                return ResourceManager.GetString("UpdateToNewVersion", resourceCulture);
             }
         }
         

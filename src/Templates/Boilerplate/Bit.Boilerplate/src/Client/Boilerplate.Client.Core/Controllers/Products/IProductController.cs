@@ -19,7 +19,4 @@ public interface IProductController : IAppController
 
     [HttpGet]
     Task<PagedResult<ProductDto>> GetProducts(CancellationToken cancellationToken = default) => default!;
-
-    [HttpGet]
-    Task<List<ProductDto>> Get(CancellationToken cancellationToken) => default!;
 }

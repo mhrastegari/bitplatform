@@ -2,39 +2,39 @@
 @inherits BitLoadingComponentBase
 
 <style>
-    .bit-ldn-Ring {
+    .blazor-loading-ring {
         display: inline-block;
         position: relative;
         width: @(Size)px;
         height: @(Size)px;
     }
 
-        .bit-ldn-Ring div {
+        .blazor-loading-ring div {
+            box-sizing: border-box;
             display: block;
             position: absolute;
-            border-radius: 50%;
-            box-sizing: border-box;
-            margin: @(Convert(8))px;
             width: @(Convert(64))px;
             height: @(Convert(64))px;
-            animation: bit-ldn-Ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-            border: @(Convert(8))px solid @(Color ?? "var(--bit-clr-fg-primary)");
-            border-color: @(Color ?? "var(--bit-clr-fg-primary)") transparent transparent transparent;
+            margin: @(Convert(8))px;
+            border: @(Convert(8))px solid @Color;
+            border-radius: 50%;
+            animation: blazor-loading-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            border-color: @Color transparent transparent transparent;
         }
 
-            .bit-ldn-Ring div:nth-child(1) {
+            .blazor-loading-ring div:nth-child(1) {
                 animation-delay: -0.45s;
             }
 
-            .bit-ldn-Ring div:nth-child(2) {
+            .blazor-loading-ring div:nth-child(2) {
                 animation-delay: -0.3s;
             }
 
-            .bit-ldn-Ring div:nth-child(3) {
+            .blazor-loading-ring div:nth-child(3) {
                 animation-delay: -0.15s;
             }
 
-    @@keyframes bit-ldn-Ring {
+    @@keyframes blazor-loading-ring {
         0% {
             transform: rotate(0deg);
         }
@@ -44,10 +44,4 @@
         }
     }
 </style>
-
-<div style="@Style" class="bit-ldn-Ring @Class">
-    @for (int i = 0; i < 4; i++)
-    {
-        <div style="@ChildStyle" class="@ChildClass"></div>
-    }
-</div>
+<div class="blazor-loading-ring"><div></div><div></div><div></div><div></div></div>

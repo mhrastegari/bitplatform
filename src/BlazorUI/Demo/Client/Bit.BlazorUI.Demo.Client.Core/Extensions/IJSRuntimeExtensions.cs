@@ -1,4 +1,4 @@
-﻿namespace Bit.BlazorUI;
+﻿namespace Microsoft.JSInterop;
 
 public static class IJSRuntimeExtensions
 {

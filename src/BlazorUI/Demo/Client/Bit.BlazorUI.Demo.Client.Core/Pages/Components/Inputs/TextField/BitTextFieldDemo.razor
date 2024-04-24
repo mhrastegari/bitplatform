@@ -9,7 +9,7 @@
                ComponentDescription="Text fields give people a way to enter and edit text. They’re used in forms, modal dialogs, tables, and other surfaces where text input is required."
                ComponentParameters="componentParameters"
                ComponentSubClasses="componentSubClasses"
-               ComponentPublicMembers="componentPublicMembers">
+               ComponentSubEnums="componentSubEnums">
     <ComponentExampleBox Title="Basics" RazorCode="@example1RazorCode" Id="example1">
         <ExamplePreview>
             <div class="example-box">
@@ -224,21 +224,6 @@
                         The form is successfully submitted.
                     </BitMessageBar>
                 }
-            </div>
-        </ExamplePreview>
-    </ComponentExampleBox>
-
-    <ComponentExampleBox Title="RTL" RazorCode="@example13RazorCode" Id="example13">
-        <ExamplePreview>
-            <div class="example-box">
-                <BitTextField Dir="BitDir.Rtl"
-                              Placeholder="پست الکترونیکی"
-                              IconName="@BitIconName.EditMail" />
-                <br />
-                <BitTextField IsUnderlined 
-                              Dir="BitDir.Rtl"
-                              Label="تقویم" 
-                              IconName="@BitIconName.Calendar" />
             </div>
         </ExamplePreview>
     </ComponentExampleBox>

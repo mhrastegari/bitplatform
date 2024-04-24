@@ -11,7 +11,7 @@ namespace Boilerplate.Client.Core.Components;
 /// on the corresponding class instead of using `ErrorResourceType` on each property. Check out <see cref="SignUpRequestDto"/> for an example.
 /// However, you need to use <see cref="AppDataAnnotationsValidator"/> instead of <see cref="DataAnnotationsValidator"/> in Blazor EditForms for this method to work.
 /// </summary>
-public partial class AppDataAnnotationsValidator : AppComponentBase
+public partial class AppDataAnnotationsValidator : AppComponentBase, IDisposable
 {
     private static readonly PropertyInfo otherPropertyNamePropertyInfo = typeof(CompareAttribute).GetProperty(nameof(CompareAttribute.OtherPropertyDisplayName))!;
 
@@ -43,7 +43,7 @@ public partial class AppDataAnnotationsValidator : AppComponentBase
         if (propertyInfo is null) return;
 
         var propertyValue = propertyInfo.GetValue(fieldIdentifier.Model);
-        var propValidationContext = new ValidationContext(fieldIdentifier.Model, serviceProvider, items: null)
+        var validationContext = new ValidationContext(fieldIdentifier.Model, serviceProvider, items: null)
         {
             MemberName = propertyInfo.Name
         };
@@ -56,11 +56,6 @@ public partial class AppDataAnnotationsValidator : AppComponentBase
             var resourceType = dtoResourceTypeAttr.ResourceType;
             var stringLocalizer = stringLocalizerFactory.Create(resourceType);
             var validationAttributes = propertyInfo.GetCustomAttributes<ValidationAttribute>();
-            var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
-            if (displayAttribute is not null)
-            {
-                displayAttribute.ResourceType ??= resourceType;
-            }
 
             foreach (var attribute in validationAttributes)
             {
@@ -73,30 +68,28 @@ public partial class AppDataAnnotationsValidator : AppComponentBase
                 if (string.IsNullOrWhiteSpace(attribute.ErrorMessageResourceName) is false && attribute.ErrorMessageResourceType is null)
                 {
                     attribute.ErrorMessageResourceType = resourceType;
-                    propValidationContext.DisplayName = stringLocalizer.GetString(displayAttribute?.Name ?? propertyInfo.Name);
+                    var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
+                    validationContext.DisplayName = stringLocalizer.GetString(displayAttribute?.Name ?? propertyInfo.Name);
 
                     if (attribute is CompareAttribute compareAttribute)
                     {
                         var otherPropertyInfoDisplayAttribute = (parent.GetProperty(compareAttribute.OtherProperty) ?? throw new InvalidOperationException($"Invalid OtherProperty {compareAttribute.OtherProperty}")).GetCustomAttribute<DisplayAttribute>();
-                        if (otherPropertyInfoDisplayAttribute is not null)
-                        {
-                            otherPropertyInfoDisplayAttribute.ResourceType ??= resourceType;
-                        }
                         otherPropertyNamePropertyInfo.SetValue(attribute, stringLocalizer.GetString(otherPropertyInfoDisplayAttribute?.Name ?? compareAttribute.OtherProperty).ToString());
                     }
                 }
 
-                var result = attribute.GetValidationResult(propertyValue, propValidationContext);
+                var result = attribute.GetValidationResult(propertyValue, validationContext);
 
                 if (result is not null)
                 {
                     results.Add(result);
                 }
             }
+
         }
         else
         {
-            Validator.TryValidateProperty(propertyValue, propValidationContext, results);
+            Validator.TryValidateProperty(propertyValue, validationContext, results);
         }
 
         validationMessageStore.Clear(fieldIdentifier);
@@ -110,11 +103,11 @@ public partial class AppDataAnnotationsValidator : AppComponentBase
 
     private void OnValidationRequested(object? sender, ValidationRequestedEventArgs e)
     {
-        var modelValidationContext = new ValidationContext(EditContext.Model, serviceProvider, items: null);
+        var validationContext = new ValidationContext(EditContext.Model, serviceProvider, items: null);
         var results = new List<ValidationResult>();
 
-        var objectType = modelValidationContext.ObjectType;
-        var objectInstance = modelValidationContext.ObjectInstance;
+        var objectType = validationContext.ObjectType;
+        var objectInstance = validationContext.ObjectInstance;
         var dtoResourceTypeAttr = objectType.GetCustomAttribute<DtoResourceTypeAttribute>();
 
         validationMessageStore.Clear();
@@ -128,17 +121,10 @@ public partial class AppDataAnnotationsValidator : AppComponentBase
 
             foreach (var propertyInfo in properties)
             {
-                var propValidationContext = new ValidationContext(objectInstance, modelValidationContext, modelValidationContext.Items)
-                {
-                    MemberName = propertyInfo.Name
-                };
+                var context = new ValidationContext(objectInstance, validationContext, validationContext.Items);
+                context.MemberName = propertyInfo.Name;
                 var propertyValue = propertyInfo.GetValue(objectInstance);
                 var validationAttributes = propertyInfo.GetCustomAttributes<ValidationAttribute>();
-                var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
-                if (displayAttribute is not null)
-                {
-                    displayAttribute.ResourceType ??= resourceType;
-                }
                 foreach (var attribute in validationAttributes)
                 {
                     if (string.IsNullOrEmpty(attribute.ErrorMessage) is false)
@@ -150,19 +136,16 @@ public partial class AppDataAnnotationsValidator : AppComponentBase
                     if (string.IsNullOrWhiteSpace(attribute.ErrorMessageResourceName) is false && attribute.ErrorMessageResourceType is null)
                     {
                         attribute.ErrorMessageResourceType = resourceType;
-                        propValidationContext.DisplayName = stringLocalizer.GetString(displayAttribute?.Name ?? propertyInfo.Name);
+                        var displayAttribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
+                        validationContext.DisplayName = stringLocalizer.GetString(displayAttribute?.Name ?? propertyInfo.Name);
                         if (attribute is CompareAttribute compareAttribute)
                         {
                             var otherPropertyInfoDisplayAttribute = (properties.FirstOrDefault(p => p.Name == compareAttribute.OtherProperty) ?? throw new InvalidOperationException($"Invalid OtherProperty {compareAttribute.OtherProperty}")).GetCustomAttribute<DisplayAttribute>();
-                            if (otherPropertyInfoDisplayAttribute is not null)
-                            {
-                                otherPropertyInfoDisplayAttribute.ResourceType ??= resourceType;
-                            }
                             otherPropertyNamePropertyInfo.SetValue(attribute, stringLocalizer.GetString(otherPropertyInfoDisplayAttribute?.Name ?? compareAttribute.OtherProperty).ToString());
                         }
                     }
 
-                    var result = attribute.GetValidationResult(propertyValue, propValidationContext);
+                    var result = attribute.GetValidationResult(propertyValue, context);
 
                     if (result is not null)
                     {
@@ -173,7 +156,7 @@ public partial class AppDataAnnotationsValidator : AppComponentBase
         }
         else
         {
-            Validator.TryValidateObject(EditContext.Model, modelValidationContext, results, true);
+            Validator.TryValidateObject(EditContext.Model, validationContext, results, true);
         }
 
         validationMessageStore.Clear();
@@ -196,10 +179,14 @@ public partial class AppDataAnnotationsValidator : AppComponentBase
         EditContext.NotifyValidationStateChanged();
     }
 
-    protected override async ValueTask DisposeAsync(bool disposing)
+    public override void Dispose()
     {
-        await base.DisposeAsync(disposing);
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
+    protected virtual void Dispose(bool disposing)
+    {
         if (disposed || disposing is false) return;
 
         if (EditContext is not null)

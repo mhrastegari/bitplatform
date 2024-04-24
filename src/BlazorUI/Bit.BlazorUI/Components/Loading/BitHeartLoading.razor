@@ -2,7 +2,7 @@
 @inherits BitLoadingComponentBase
 
 <style>
-    .bit-ldn-Heart {
+    .blazor-loading-heart {
         display: inline-block;
         position: relative;
         width: @(Size)px;
@@ -11,37 +11,37 @@
         transform-origin: @(Convert(40))px @(Convert(40))px;
     }
 
-        .bit-ldn-Heart div {
-            position: absolute;
+        .blazor-loading-heart div {
             top: @(Convert(32))px;
             left: @(Convert(32))px;
+            position: absolute;
             width: @(Convert(32))px;
             height: @(Convert(32))px;
-            background: @(Color ?? "var(--bit-clr-fg-primary)");
-            animation: bit-ldn-Heart 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+            background: @Color;
+            animation: blazor-loading-heart 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
         }
 
-            .bit-ldn-Heart div:after,
-            .bit-ldn-Heart div:before {
+            .blazor-loading-heart div:after,
+            .blazor-loading-heart div:before {
                 content: " ";
-                display: block;
                 position: absolute;
+                display: block;
                 width: @(Convert(32))px;
                 height: @(Convert(32))px;
-                background: @(Color ?? "var(--bit-clr-fg-primary)");
+                background: @Color;
             }
 
-            .bit-ldn-Heart div:before {
+            .blazor-loading-heart div:before {
                 left: -@(Convert(24))px;
                 border-radius: 50% 0 0 50%;
             }
 
-            .bit-ldn-Heart div:after {
+            .blazor-loading-heart div:after {
                 top: -@(Convert(24))px;
                 border-radius: 50% 50% 0 0;
             }
 
-    @@keyframes bit-ldn-Heart {
+    @@keyframes blazor-loading-heart {
         0% {
             transform: scale(0.95);
         }
@@ -67,7 +67,4 @@
         }
     }
 </style>
-
-<div style="@Style" class="bit-ldn-Heart @Class">
-    <div style="@ChildStyle" class="@ChildClass"></div>
-</div>
+<div class="blazor-loading-heart"><div></div></div>

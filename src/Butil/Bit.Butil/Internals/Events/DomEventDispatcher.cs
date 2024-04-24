@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.JSInterop;
 
 namespace Bit.Butil;
@@ -10,11 +9,6 @@ internal static class DomEventDispatcher
     private static readonly object FalseUseCapture = false;
     private static readonly object TrueUseCapture = true;
 
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ButilMouseEventArgs))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ButilKeyboardEventArgs))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(DomEventListenersManager))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(DomMouseEventListenersManager))]
-    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(DomKeyboardEventListenersManager))]
     internal static async Task AddEventListener<T>(IJSRuntime js,
         string elementName,
         string domEvent,

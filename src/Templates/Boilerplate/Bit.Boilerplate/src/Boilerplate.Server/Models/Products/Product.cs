@@ -1,4 +1,5 @@
-﻿using Boilerplate.Server.Models.Categories;
+﻿using System.Diagnostics.CodeAnalysis;
+using Boilerplate.Server.Models.Categories;
 
 namespace Boilerplate.Server.Models.Products;
 
@@ -16,6 +17,7 @@ public class Product
     [MaxLength(512)]
     public string? Description { get; set; }
 
+    [NotNull]
     public DateTimeOffset CreatedOn { get; set; } = DateTimeOffset.UtcNow;
 
     [ForeignKey(nameof(CategoryId))]

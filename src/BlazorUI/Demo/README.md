@@ -1,3 +1,3 @@
 # Bit.BlazorUI.Demo
 
-https://blazorui.bitplatform.dev/
+https://components.bitplatform.dev/

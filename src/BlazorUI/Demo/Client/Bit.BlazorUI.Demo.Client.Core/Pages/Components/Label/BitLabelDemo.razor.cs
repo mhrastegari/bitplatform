@@ -57,7 +57,4 @@ Collapsed: [ <BitLabel Visibility=""BitVisibility.Collapsed"">Collapsed Label</B
 <BitLabel For=""label-input"">A Label for An Input</BitLabel>
 <input type=""text"" name=""label-input"" id=""label-input"" />";
 
-    private readonly string example6RazorCode = @"
-<BitLabel Dir=""BitDir.Rtl"">من یک برچسب هستم</BitLabel>";
-
 }

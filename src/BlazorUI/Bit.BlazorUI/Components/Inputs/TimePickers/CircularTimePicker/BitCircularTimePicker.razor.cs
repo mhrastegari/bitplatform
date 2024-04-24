@@ -8,10 +8,6 @@ public partial class BitCircularTimePicker
     private const string FORMAT_24_HOURS = "HH:mm";
     private const string FORMAT_12_HOURS = "hh:mm tt";
 
-
-
-    private bool IsOpenHasBeenSet;
-
     private bool isOpen;
     private CultureInfo culture = CultureInfo.CurrentUICulture;
     private BitIconLocation iconLocation = BitIconLocation.Right;
@@ -23,9 +19,10 @@ public partial class BitCircularTimePicker
     private int? _hour;
     private int? _minute;
     private string? _labelId;
-    private string? _inputId;
-    private string _calloutId = string.Empty;
-    private string _circularTimePickerId = string.Empty;
+    private string? _textFieldId;
+    private string? _wrapperId;
+    private string? _calloutId;
+    private string? _overlayId;
     private BitCircularTimePickerDialMode _currentView = BitCircularTimePickerDialMode.Hours;
     private DotNetObjectReference<BitCircularTimePicker> _dotnetObj = default!;
     private string _focusClass
@@ -99,6 +96,7 @@ public partial class BitCircularTimePicker
     /// <summary>
     /// Whether or not this TimePicker is open
     /// </summary>
+    [Parameter]
     public bool IsOpen
     {
         get => isOpen;
@@ -107,14 +105,9 @@ public partial class BitCircularTimePicker
             if (isOpen == value) return;
 
             isOpen = value;
-
             ClassBuilder.Reset();
-
-            _ = IsOpenChanged.InvokeAsync(value);
         }
     }
-
-    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
 
     /// <summary>
     /// Capture and render additional attributes in addition to the main callout's parameters
@@ -204,14 +197,7 @@ public partial class BitCircularTimePicker
 
 
     [JSInvokable("CloseCallout")]
-    public void CloseCalloutBeforeAnotherCalloutIsOpened()
-    {
-        if (IsEnabled is false) return;
-        if (IsOpenHasBeenSet && IsOpenChanged.HasDelegate is false) return;
-
-        IsOpen = false;
-        StateHasChanged();
-    }
+    public void CloseCalloutBeforeAnotherCalloutIsOpened() => IsOpen = false;
 
     public Task OpenCallout() => HandleOnClick();
 
@@ -230,10 +216,11 @@ public partial class BitCircularTimePicker
 
     protected override void OnInitialized()
     {
-        _circularTimePickerId = $"BitCircularTimePicker-{UniqueId}";
-        _labelId = $"{_circularTimePickerId}-label";
-        _inputId = $"{_circularTimePickerId}-input";
-        _calloutId = $"{_circularTimePickerId}-callout";
+        _labelId = $"BitCircularTimePicker-{UniqueId}-label";
+        _wrapperId = $"BitCircularTimePicker-{UniqueId}-wrapper";
+        _calloutId = $"BitCircularTimePicker-{UniqueId}-callout";
+        _overlayId = $"BitCircularTimePicker-{UniqueId}-overlay";
+        _textFieldId = $"BitCircularTimePicker-{UniqueId}-text-field";
 
         _hour = CurrentValue?.Hours;
         _minute = CurrentValue?.Minutes;
@@ -274,12 +261,8 @@ public partial class BitCircularTimePicker
 
     private async Task CloseCallout()
     {
-        if (IsEnabled is false) return;
-        if (IsOpenHasBeenSet && IsOpenChanged.HasDelegate is false) return;
-
+        await _js.InvokeVoidAsync("BitCircularTimePicker.toggleTimePickerCallout", _dotnetObj, _Id, _calloutId, _overlayId, IsOpen, IsResponsive);
         IsOpen = false;
-        await ToggleCallout();
-
         StateHasChanged();
     }
 
@@ -296,10 +279,10 @@ public partial class BitCircularTimePicker
     private async Task HandleOnClick()
     {
         if (IsEnabled is false) return;
-        if (IsOpenHasBeenSet && IsOpenChanged.HasDelegate is false) return;
 
-        IsOpen = true;
-        await ToggleCallout();
+        await _js.InvokeVoidAsync("BitCircularTimePicker.toggleTimePickerCallout", _dotnetObj, _Id, _calloutId, _overlayId, IsOpen, IsResponsive);
+
+        IsOpen = !IsOpen;
 
         await OnClick.InvokeAsync();
     }
@@ -461,25 +444,6 @@ public partial class BitCircularTimePicker
     private string GetValueFormat()
     {
         return ValueFormat.HasValue() ? ValueFormat! : (TimeFormat == BitTimeFormat.TwentyFourHours ? FORMAT_24_HOURS : FORMAT_12_HOURS);
-    }
-
-    private async Task ToggleCallout()
-    {
-        if (IsEnabled is false) return;
-
-        await _js.ToggleCallout(_dotnetObj,
-                                _circularTimePickerId,
-                                _calloutId,
-                                IsOpen,
-                                IsResponsive ? BitResponsiveMode.Top : BitResponsiveMode.None,
-                                BitDropDirection.TopAndBottom,
-                                false,
-                                "",
-                                0,
-                                "",
-                                "",
-                                false,
-                                RootElementClass);
     }
 
     /// <inheritdoc />

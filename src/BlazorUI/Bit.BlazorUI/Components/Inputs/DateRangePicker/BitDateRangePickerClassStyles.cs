@@ -491,14 +491,4 @@ public class BitDateRangePickerClassStyles
     /// Custom CSS classes/styles for each year button of the BitDateRangePicker.
     /// </summary>
     public string? YearButton { get; set; }
-
-    /// <summary>
-    /// Custom CSS classes/styles for the BitDatePicker's clear button.
-    /// </summary>
-    public string? ClearButton { get; set; }
-
-    /// <summary>
-    /// Custom CSS classes/styles for the BitDatePicker's clear button icon.
-    /// </summary>
-    public string? ClearButtonIcon { get; set; }
 }

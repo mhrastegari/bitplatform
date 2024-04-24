@@ -14,6 +14,8 @@ public class BitDropdownCustom
 
     public bool Visible { get; set; } = true;
 
+    public bool IsSelected { get; set; }
+
     public BitDropdownItemType Type { get; set; } = BitDropdownItemType.Normal;
 
     public string? CssStyle { get; set; }

@@ -142,11 +142,6 @@ public partial class BitFileUpload : IDisposable
     [Parameter] public EventCallback<BitFileInfo> OnRemoveFailed { get; set; }
 
     /// <summary>
-    /// Callback for when a file upload is about to start.
-    /// </summary>
-    [Parameter] public EventCallback<BitFileInfo> OnUploading { get; set; }
-
-    /// <summary>
     /// Callback for when a file upload is done.
     /// </summary>
     [Parameter] public EventCallback<BitFileInfo> OnUploadComplete { get; set; }
@@ -227,7 +222,7 @@ public partial class BitFileUpload : IDisposable
     /// <summary>
     /// Starts Uploading the file(s).
     /// </summary>
-    public async Task Upload(BitFileInfo? fileInfo = null, string? uploadUrl = null)
+    public async Task Upload(BitFileInfo? fileInfo = null)
     {
         if (Files is null) return;
 
@@ -237,17 +232,16 @@ public partial class BitFileUpload : IDisposable
         }
 
         await UpdateStatus(BitFileUploadStatus.InProgress, fileInfo);
-
         if (fileInfo is null)
         {
             foreach (var file in Files)
             {
-                await UploadOneFile(file, uploadUrl);
+                await UploadOneFile(file);
             }
         }
         else
         {
-            await UploadOneFile(fileInfo, uploadUrl);
+            await UploadOneFile(fileInfo);
         }
     }
 
@@ -336,7 +330,7 @@ public partial class BitFileUpload : IDisposable
     {
         if (IsEnabled is false) return;
 
-        await _js.BitFileUploadBrowse(_inputRef);
+        await _js.BrowseFile(_inputRef);
     }
 
 
@@ -356,16 +350,18 @@ public partial class BitFileUpload : IDisposable
     {
         if (firstRender is false) return;
 
-        _dropZoneRef = await _js.BitFileUploadSetupDragDrop(RootElement, _inputRef);
+        _dropZoneRef = await _js.SetupFileUploadDropzone(RootElement, _inputRef);
     }
 
 
 
     private async Task HandleOnChange()
     {
+        if (UploadUrl is null) return;
+
         var url = AddQueryString(UploadUrl, UploadRequestQueryStrings);
 
-        Files = await _js.BitFileUploadReset(UniqueId, _dotnetObj, _inputRef, url, UploadRequestHttpHeaders);
+        Files = await _js.ResetFileUpload(UniqueId, _dotnetObj, _inputRef, url, UploadRequestHttpHeaders);
 
         if (Files is null) return;
 
@@ -377,7 +373,7 @@ public partial class BitFileUpload : IDisposable
         }
     }
 
-    private async Task UploadOneFile(BitFileInfo fileInfo, string? uploadUrl = null)
+    private async Task UploadOneFile(BitFileInfo fileInfo)
     {
         if (Files is null || fileInfo.Status == BitFileUploadStatus.NotAllowed) return;
 
@@ -430,19 +426,14 @@ public partial class BitFileUpload : IDisposable
             to = fileInfo.Size;
         }
 
-        if (from == 0)
-        {
-            await OnUploading.InvokeAsync(fileInfo);
-        }
-
-        await _js.BitFileUploadUpload(UniqueId, from, to, fileInfo.Index, uploadUrl, fileInfo.HttpHeaders);
+        await _js.UploadFile(UniqueId, from, to, fileInfo.Index);
     }
 
     private async Task PauseUploadOneFile(int index)
     {
         if (Files is null) return;
 
-        await _js.BitFileUploadPause(UniqueId, index);
+        await _js.PauseFile(UniqueId, index);
         var file = Files[index];
         await UpdateStatus(BitFileUploadStatus.Paused, file);
         file.PauseUploadRequested = false;
@@ -523,7 +514,7 @@ public partial class BitFileUpload : IDisposable
     {
         if (Files is null) return;
 
-        await _js.BitFileUploadPause(UniqueId, index);
+        await _js.PauseFile(UniqueId, index);
         var file = Files[index];
         await UpdateStatus(BitFileUploadStatus.Canceled, file);
         file.CancelUploadRequested = false;
@@ -586,22 +577,20 @@ public partial class BitFileUpload : IDisposable
         return AddQueryString(uri, new Dictionary<string, string> { { name, value } });
     }
 
-    private static string AddQueryString(string? url, IReadOnlyDictionary<string, string> queryStrings)
+    private static string AddQueryString(string uri, IReadOnlyDictionary<string, string> queryStrings)
     {
-        if (url.HasNoValue()) return string.Empty;
-
         // this method is copied from:
         // https://github.com/aspnet/HttpAbstractions/blob/master/src/Microsoft.AspNetCore.WebUtilities/QueryHelpers.cs
 
-        int anchorIndex = url.IndexOf('#', StringComparison.InvariantCultureIgnoreCase);
-        string uriToBeAppended = url;
+        int anchorIndex = uri.IndexOf('#', StringComparison.InvariantCultureIgnoreCase);
+        string uriToBeAppended = uri;
         string? anchorText = null;
 
         // If there is an anchor, then the query string must be inserted before its first occurrence.
         if (anchorIndex != -1)
         {
-            anchorText = url[anchorIndex..];
-            uriToBeAppended = url[..anchorIndex];
+            anchorText = uri[anchorIndex..];
+            uriToBeAppended = uri[..anchorIndex];
         }
 
         var queryIndex = uriToBeAppended.IndexOf('?', StringComparison.InvariantCultureIgnoreCase);
@@ -702,7 +691,7 @@ public partial class BitFileUpload : IDisposable
         if (_dotnetObj is not null)
         {
             _dotnetObj.Dispose();
-            await _js.BitFileUploadDispose(UniqueId);
+            await _js.DisposeFileUpload(UniqueId);
         }
 
         _disposed = true;

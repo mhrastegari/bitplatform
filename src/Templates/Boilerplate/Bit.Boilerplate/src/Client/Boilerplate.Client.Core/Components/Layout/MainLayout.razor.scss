@@ -3,36 +3,39 @@
 @import '../../Styles/abstracts/_media-queries.scss';
 @import '../../Styles/abstracts/_bit-css-variables.scss';
 
-.layout {
-    height: 100vh;
+.main {
+    width: 100%;
     display: flex;
+    min-height: 100vh;
     flex-flow: column;
+    position: relative;
+    background-color: $bit-color-background-secondary;
+    padding-top: calc(rem2(48px) + var(--bit-status-bar-height));
+
+    .bit-ios & {
+        padding-top: calc(rem2(48px) + env(safe-area-inset-top));
+    }
 }
 
-main {
-    width: 100%;
-    flex-grow: 1;
+.main--authenticated {
     display: flex;
-    overflow: auto;
-    position: relative;
-    box-sizing: border-box;
-    justify-content: flex-start;
+    flex-flow: column;
+    margin-left: rem2($navMenuWidth);
+    width: calc(100% - rem2($navMenuWidth));
+
+    @include lt-lg {
+        width: 100%;
+        margin-left: 0;
+    }
 }
 
 .main-content {
     flex-grow: 1;
     display: flex;
-    padding: 2rem;
-    min-height: 100%;
+    padding: 1rem;
     flex-flow: column;
-    height: fit-content;
     align-items: center;
     justify-content: center;
-    background-color: $bit-color-background-secondary;
-
-    @include lt-md {
-        padding: 1rem;
-    }
 }
 
 ::deep {
@@ -84,7 +87,7 @@ main {
 
     .form-input-error,
     .validation-message {
-        text-align: start;
+        text-align: left;
         font-size: rem2(12px);
         line-height: rem2(16px);
         color: $bit-color-state-error;
@@ -96,9 +99,9 @@ main {
     }
 
     .form-message-bar {
+        top: 0;
+        left: 0;
         position: absolute;
-        inset-block-start: 0;
-        inset-inline-start: 0;
         border-radius: rem2(4px) rem2(4px) 0 0;
     }
 }

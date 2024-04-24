@@ -300,7 +300,7 @@ public partial class BitCircularTimePickerDemo
     private TimeSpan? selectedTime = new TimeSpan(5, 12, 15);
     private FormValidationCircularTimePickerModel formValidationCircularTimePickerModel = new();
     private string successMessage = string.Empty;
-    private BitCircularTimePicker circularTimePicker = default!;
+    private BitCircularTimePicker circularTimePicker;
 
     private async Task OpenCallout()
     {

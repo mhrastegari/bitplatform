@@ -4,8 +4,7 @@
 <div @ref="RootElement" @attributes="HtmlAttributes"
      id="@_Id"
      class="@ClassBuilder.Value"
-     style="@StyleBuilder.Value"
-     dir="@Dir?.ToString().ToLower()">
+     style="@StyleBuilder.Value">
     @if (Label.HasValue())
     {
         <label style="@Styles?.Label" class="bit-sld-lbl @Classes?.Label" @ref="_labelRef">@Label</label>

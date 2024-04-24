@@ -4,8 +4,8 @@ namespace Bit.BlazorUI.Demo.Client.Core.Pages.Components.Inputs.SearchBox;
 
 public partial class BitSearchBoxDemo
 {
-    private readonly List<ComponentParameter> componentParameters =
-    [
+    private readonly List<ComponentParameter> componentParameters = new()
+    {
         new()
         {
             Name = "Autocomplete",
@@ -174,9 +174,10 @@ public partial class BitSearchBoxDemo
             DefaultValue = "false",
             Description = "Whether to show the search button.",
         }
-    ];
-    private readonly List<ComponentSubClass> componentSubClasses =
-    [
+    };
+
+    private readonly List<ComponentSubClass> componentSubClasses = new()
+    {
         new()
         {
             Id = "searchbox-class-styles",
@@ -242,35 +243,20 @@ public partial class BitSearchBoxDemo
                 }
             }
         }
-    ];
-    private readonly List<ComponentParameter> componentPublicMembers =
-    [
-        new()
-        {
-            Name = "InputElement",
-            Type = "ElementReference",
-            Description = "The ElementReference to the input element of the BitSearchBox.",
-        },
-        new()
-        {
-            Name = "FocusAsync",
-            Type = "ValueTask",
-            Description = "Gives focus to the input element of the BitSearchBox.",
-        }
-    ];
+    };
 
     [Inject] private HttpClient HttpClient { get; set; } = default!;
     [Inject] private NavigationManager NavManager { get; set; } = default!;
 
-    private string? TwoWaySearchValue;
-    private string? OnChangeSearchValue;
-    private string? OnSearchValue;
-    private string? SearchValue;
-    private string? SearchValueWithSuggestFilterFunction;
-    private string? SearchValueWithSearchDelay;
-    private string? SearchValueWithMinSearchLength;
-    private string? SearchValueWithMaxSuggestedItems;
-    private string? ItemsProviderSearchValue;
+    private string TwoWaySearchValue;
+    private string OnChangeSearchValue;
+    private string OnSearchValue;
+    private string SearchValue;
+    private string SearchValueWithSuggestFilterFunction;
+    private string SearchValueWithSearchDelay;
+    private string SearchValueWithMinSearchLength;
+    private string SearchValueWithMaxSuggestedItems;
+    private string ItemsProviderSearchValue;
 
     private readonly ValidationSearchBoxModel ValidationSearchBoxModel = new();
 
@@ -315,7 +301,7 @@ public partial class BitSearchBoxDemo
 
             var data = await HttpClient.GetFromJsonAsync(url, AppJsonContext.Default.PagedResultProductDto);
 
-            return data!.Items!.Select(i => i.Name)!.ToList()!;
+            return data!.Items.Select(i => i.Name).ToList();
         }
         catch
         {
@@ -515,11 +501,4 @@ private async Task<ICollection<string>> LoadItems(string? search, int count)
         return new List<string>();
     }
 }";
-
-    private readonly string example10RazorCode = @"
-<BitSearchBox Dir=""BitDir.Rtl"" Placeholder=""جستجو"" />
-<BitSearchBox IsUnderlined Dir=""BitDir.Rtl"" Placeholder=""جستجو"" />
-<BitSearchBox ShowSearchButton
-              Dir=""BitDir.Rtl""
-              Placeholder=""جستجو"" />";
 }

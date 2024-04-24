@@ -118,7 +118,6 @@
 .toggle-theme-btn {
     padding: 0;
     border: none;
-    display: none;
     cursor: pointer;
     height: rem2(35px);
     border-radius: 50%;
@@ -145,12 +144,12 @@
     }
 }
 
-.bit-theme-dark .dark-theme {
-    display: unset;
+.bit-theme-dark .light-theme {
+    display: none;
 }
 
-.bit-theme-light .light-theme {
-    display: unset;
+.bit-theme-light .dark-theme {
+    display: none;
 }
 
 .header-second-row {
@@ -200,7 +199,6 @@
 
 ::deep {
     .header-nav-close-btn {
-        z-index: 2;
         top: rem2(10px);
         right: rem2(10px);
         width: rem2(44px);
@@ -233,19 +231,21 @@
 .header-menu-popup {
     display: none;
     z-index: 1302;
-    top: rem2(44px);
+    top: rem2(36px);
     cursor: default;
     position: absolute;
     flex-flow: row nowrap;
+    max-height: rem2(350px);
     border-radius: rem2(4px);
     padding: rem2(8px) rem2(16px);
-    border: 1px solid $bit-color-border-secondary;
-    background-color: $bit-color-background-secondary;
+    box-shadow: $bit-box-shadow-callout;
+    border-color: $bit-color-border-secondary;
+    background-color: $bit-color-background-primary;
 
     @include sm {
         padding: 0;
         overflow: auto;
-        max-height: 25rem;
+        max-height: rem2(222px);
         flex-flow: column nowrap;
     }
 
@@ -275,6 +275,7 @@
     .menu-item {
         display: flex;
         cursor: pointer;
+        margin: rem2(8px) 0;
         align-items: center;
         flex-flow: row nowrap;
         border-radius: rem2(4px);
@@ -310,8 +311,7 @@
     .menu-item--disabled {
         cursor: default;
 
-        .item-title,
-        .item-desc {
+        .item-title {
             color: $bit-color-foreground-disabled;
         }
 

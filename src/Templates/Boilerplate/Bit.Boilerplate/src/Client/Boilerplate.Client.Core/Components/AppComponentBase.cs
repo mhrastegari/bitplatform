@@ -2,7 +2,7 @@
 
 namespace Boilerplate.Client.Core.Components;
 
-public partial class AppComponentBase : ComponentBase, IAsyncDisposable
+public partial class AppComponentBase : ComponentBase, IDisposable
 {
     [AutoInject] protected IJSRuntime JSRuntime = default!;
 
@@ -183,19 +183,9 @@ public partial class AppComponentBase : ComponentBase, IAsyncDisposable
         };
     }
 
-    public async ValueTask DisposeAsync()
+    public virtual void Dispose()
     {
-        await DisposeAsync(true);
-
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual async ValueTask DisposeAsync(bool disposing)
-    {
-        if (disposing)
-        {
-            cts.Cancel();
-            cts.Dispose();
-        }
+        cts.Cancel();
+        cts.Dispose();
     }
 }

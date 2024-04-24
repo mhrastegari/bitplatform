@@ -54,23 +54,11 @@ public partial class _BitDropdownOptionDemo
         new() { Text = "Carrot", Value = "v-car", Class = "custom-veg" },
         new() { Text = "Lettuce", Value = "v-let", Class = "custom-veg" }
     };
-    private readonly List<BitDropdownItem<string>> comboBoxItems = new()
-    {
-        new() { ItemType = BitDropdownItemType.Header, Text = "Fruits" },
-        new() { Text = "Apple", Value = "f-app" },
-        new() { Text = "Banana", Value = "f-ban" },
-        new() { Text = "Orange", Value = "f-ora", IsEnabled = false },
-        new() { Text = "Grape", Value = "f-gra" },
-        new() { ItemType = BitDropdownItemType.Divider },
-        new() { ItemType = BitDropdownItemType.Header, Text = "Vegetables" },
-        new() { Text = "Broccoli", Value = "v-bro" },
-        new() { Text = "Carrot", Value = "v-car" },
-        new() { Text = "Lettuce", Value = "v-let" }
-    };
+
 
 
     private string controlledValue = "f-app";
-    private ICollection<string?> controlledValues = ["f-app", "f-ban"];
+    private ICollection<string?> controlledValues = new[] { "f-app", "f-ban" };
 
     private BitDropdownOption<string>? changedItem;
     private BitDropdownOption<string>[] changedItems = Array.Empty<BitDropdownOption<string>>();
@@ -79,16 +67,10 @@ public partial class _BitDropdownOptionDemo
     private BitDropdownOption<string>? selectedItem2;
 
     private string? clearValue = "f-app";
-    private ICollection<string?> clearValues = ["f-app", "f-ban"];
+    private ICollection<string?> clearValues = new[] { "f-app", "f-ban" };
 
     private string successMessage = string.Empty;
     private FormValidationDropdownModel validationModel = new();
-
-    private string comboBoxValueSample1 = default!;
-    private string comboBoxValueSample2 = default!;
-    private string comboBoxValueSample3 = default!;
-    private string comboBoxValueSample4 = default!;
-    private ICollection<string> comboBoxValues = [];
 
 
     protected override void OnInitialized()
@@ -113,10 +95,5 @@ public partial class _BitDropdownOptionDemo
     private void HandleInvalidSubmit()
     {
         successMessage = string.Empty;
-    }
-
-    private void HandleOnDynamicAdd(BitDropdownOption<string> item)
-    {
-        comboBoxItems.Add(new() { Text = item.Text, Value = item.Value });
     }
 }

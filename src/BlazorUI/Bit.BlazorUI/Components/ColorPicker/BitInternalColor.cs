@@ -1,5 +1,7 @@
-﻿using System;
+﻿using System.Globalization;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Bit.BlazorUI.Tests")]
 namespace Bit.BlazorUI;
 
 internal class BitInternalColor
@@ -189,8 +191,8 @@ internal class BitInternalColor
 
     private void GenerateStringValues()
     {
-        _hex = FormattableString.Invariant($"#{R:X2}{G:X2}{B:X2}");
-        _rgb = FormattableString.Invariant($"rgb({R},{G},{B})");
-        _rgba = FormattableString.Invariant($"rgba({R},{G},{B},{A})");
+        _hex = $"#{R:X2}{G:X2}{B:X2}";
+        _rgb = $"rgb({R},{G},{B})";
+        _rgba = $"rgba({R},{G},{B},{A})";
     }
 }

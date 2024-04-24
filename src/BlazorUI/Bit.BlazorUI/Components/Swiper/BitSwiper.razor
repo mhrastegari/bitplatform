@@ -4,8 +4,7 @@
 <div @ref="RootElement" @attributes="HtmlAttributes" @onpointerdown:preventDefault @onpointerup="HandlePointerUp" @onpointermove="HandlePointerMove" @onpointerdown="HandlePointerDown"
      id="@_Id"
      style="@StyleBuilder.Value"
-     class="@ClassBuilder.Value"
-     dir="@base.Dir?.ToString().ToLower()">
+     class="@ClassBuilder.Value">
 
     <div @ref="_swiper"
          class="bit-swp-cnt"

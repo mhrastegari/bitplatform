@@ -125,7 +125,7 @@ public partial class BitButton
     /// <summary>
     /// The position of the loading Label in regards to the spinner animation.
     /// </summary>
-    [Parameter] public BitLabelPosition LoadingLabelPosition { get; set; } = BitLabelPosition.End;
+    [Parameter] public BitLabelPosition LoadingLabelPosition { get; set; } = BitLabelPosition.Right;
 
     /// <summary>
     /// Used to customize the content inside the Button in the Loading state.
@@ -230,10 +230,10 @@ public partial class BitButton
         => LoadingLabelPosition switch
         {
             BitLabelPosition.Top => "bit-btn-top",
-            BitLabelPosition.Start => "bit-btn-srt",
-            BitLabelPosition.End => "bit-btn-end",
+            BitLabelPosition.Left => "bit-btn-lft",
+            BitLabelPosition.Right => "bit-btn-rgt",
             BitLabelPosition.Bottom => "bit-btn-btm",
-            _ => "bit-btn-end"
+            _ => "bit-btn-rgt"
         };
 
     protected virtual async Task HandleOnClick(MouseEventArgs e)

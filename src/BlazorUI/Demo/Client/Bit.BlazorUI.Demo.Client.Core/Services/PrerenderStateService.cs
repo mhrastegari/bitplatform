@@ -4,7 +4,7 @@ namespace Bit.BlazorUI.Demo.Client.Core.Services;
 /// <summary>
 /// For more information <see cref="IPrerenderStateService"/> docs.
 /// </summary>
-public class PrerenderStateService : IPrerenderStateService, IDisposable
+public class PrerenderStateService : IPrerenderStateService, IAsyncDisposable
 {
     private PersistingComponentStateSubscription? subscription;
     private readonly PersistentComponentState? persistentComponentState;
@@ -37,19 +37,18 @@ public class PrerenderStateService : IPrerenderStateService, IDisposable
         values.TryAdd(key, value);
     }
 
-    private Task PersistAsJson()
+    async Task PersistAsJson()
     {
         foreach (var item in values)
         {
             persistentComponentState!.PersistAsJson(item.Key, item.Value);
         }
-
-        return Task.CompletedTask;
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        if (AppRenderMode.PrerenderEnabled is false) return;
+        if (AppRenderMode.PrerenderEnabled is false)
+            return;
 
         subscription?.Dispose();
     }

@@ -6,7 +6,6 @@
             Description="progressindicator component of the bit BlazorUI components" />
 
 <ComponentDemo ComponentName="ProgressIndicator"
-               ComponentSubClasses="componentSubClasses"
                ComponentDescription="BitProgressIndicators are used to show the completion status of an operation lasting more than 2 seconds.
 If the state of progress cannot be determined, use a Spinner instead.
 ProgressIndicators can appear in a new panel, a flyout, under the UI initiating the operation, or even replacing the initiating UI,
@@ -22,8 +21,9 @@ Bars moving backwards reduce confidence in the service."
                                   Description="@Description"
                                   PercentComplete="@CompletedPercent"
                                   BarHeight="50" />
-            <br />
-            <BitButton OnClick="StartProgress">Start Progress</BitButton>
+            <div>
+                <BitButton OnClick="StartProgress">Start Progress</BitButton>
+            </div>
         </ExamplePreview>
     </ComponentExampleBox>
 

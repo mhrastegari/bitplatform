@@ -7,7 +7,6 @@
        id="@_Id"
        style="@StyleBuilder.Value"
        class="@ClassBuilder.Value"
-       dir="@Dir?.ToString().ToLower()"
        href="@Href"
        title="@Title"
        target="@Target"
@@ -16,10 +15,7 @@
        aria-hidden="@AriaHidden"
        aria-describedby="@AriaDescription">
         <span style="@Styles?.Container" class="bit-acb-ictn @Classes?.Container">
-            @if (IconName is not null)
-            {
-                <i style="@Classes?.Icon" class="bit-icon bit-icon--@IconName @Classes?.Icon" />
-            }
+            <i style="@Classes?.Icon" class="bit-icon bit-icon--@IconName @Classes?.Icon" />
             @if (ChildContent is not null)
             {
                 <span style="@Styles?.Content" class="bit-acb-con @Classes?.Content">
@@ -35,18 +31,14 @@ else
             id="@_Id"
             style="@StyleBuilder.Value"
             class="@ClassBuilder.Value"
-            dir="@Dir?.ToString().ToLower()"
-            type="@_buttonType.GetValue()"
             title="@Title"
             tabindex="@_tabIndex"
+            type="@_buttonType.GetValue()"
             aria-label="@AriaLabel"
             aria-hidden="@AriaHidden"
             aria-describedby="@AriaDescription">
         <span style="@Styles?.Container" class="bit-acb-ictn @Classes?.Container">
-            @if (IconName is not null)
-            {
-                <i style="@Styles?.Icon" class="bit-icon bit-icon--@IconName @Classes?.Icon" />
-            }
+            <i style="@Styles?.Icon" class="bit-icon bit-icon--@IconName @Classes?.Icon" />
             @if (ChildContent is not null)
             {
                 <span style="@Styles?.Content" class="bit-acb-con @Classes?.Content">

@@ -4,8 +4,8 @@ namespace Bit.BlazorUI.Demo.Client.Core.Pages.Components.Inputs.OtpInput;
 
 public partial class BitOtpInputDemo
 {
-    private readonly List<ComponentParameter> componentParameters =
-    [
+    private readonly List<ComponentParameter> componentParameters = new()
+    {
         new()
         {
             Name = "AutoFocus",
@@ -21,6 +21,15 @@ public partial class BitOtpInputDemo
             Description = "Custom CSS classes for different parts of the BitOtpInput.",
             LinkType = LinkType.Link,
             Href = "#otpinput-class-styles",
+        },
+        new()
+        {
+            Name = "Direction",
+            Type = "BitOtpInputDirection",
+            DefaultValue = "BitOtpInputDirection.LeftToRight",
+            Description = "The render direction of the inputs.",
+            LinkType = LinkType.Link,
+            Href = "#direction-enum",
         },
         new()
         {
@@ -76,30 +85,17 @@ public partial class BitOtpInputDemo
         },
         new()
         {
-            Name = "Reversed",
-            Type = "bool",
-            DefaultValue = "false",
-            Description = "Defines whether to render inputs in the opposite direction.",
-        },
-        new()
-        {
             Name = "Styles",
             Type = "BitOtpInputClassStyles?",
             DefaultValue = "null",
             Description = "Custom CSS styles for different parts of the BitOtpInput.",
             LinkType = LinkType.Link,
             Href = "#otpinput-class-styles",
-        },
-        new()
-        {
-            Name = "Vertical",
-            Type = "bool",
-            DefaultValue = "false",
-            Description = "Defines whether to render inputs vertically.",
-        },
-    ];
-    private readonly List<ComponentSubClass> componentSubClasses =
-    [
+        }
+    };
+
+    private readonly List<ComponentSubClass> componentSubClasses = new()
+    {
         new()
         {
             Id = "otpinput-class-styles",
@@ -123,9 +119,42 @@ public partial class BitOtpInputDemo
                 }
             }
         }
-    ];
-    private readonly List<ComponentSubEnum> componentSubEnums =
-    [
+    };
+
+    private readonly List<ComponentSubEnum> componentSubEnums = new()
+    {
+        new()
+        {
+            Id = "direction-enum",
+            Name = "BitOtpInputDirection",
+            Items = new()
+            {
+                new()
+                {
+                    Name = "LeftToRight",
+                    Description = "The OtpInput showed in the left to right direction.",
+                    Value = "0"
+                },
+                new()
+                {
+                    Name = "RightToLeft",
+                    Description = "The OtpInput showed in the right to left direction.",
+                    Value = "1"
+                },
+                new()
+                {
+                    Name = "TopToBottom",
+                    Description = "The OtpInput showed in the top to bottom direction.",
+                    Value = "2"
+                },
+                new()
+                {
+                    Name = "BottomToTop",
+                    Description = "The OtpInput showed in the bottom to top direction.",
+                    Value = "3"
+                }
+            }
+        },
         new()
         {
             Id = "inputType-enum",
@@ -152,22 +181,8 @@ public partial class BitOtpInputDemo
                 }
             }
         }
-    ];
-    private readonly List<ComponentParameter> componentPublicMembers =
-    [
-        new()
-        {
-            Name = "InputElements",
-            Type = "ElementReference[]",
-            Description = "The ElementReferences to the input elements of the BitOtpInput.",
-        },
-        new()
-        {
-            Name = "FocusAsync",
-            Type = "ValueTask",
-            Description = "Gives focus to a specific input element of the BitOtpInput.",
-        }
-    ];
+    };
+
 
 
     private string? oneWayValue;
@@ -212,10 +227,10 @@ public partial class BitOtpInputDemo
 <BitOtpInput InputType=""BitOtpInputType.Password"" />";
 
     private readonly string example3RazorCode = @"
-<BitOtpInput />
-<BitOtpInput Reversed />
-<BitOtpInput Vertical />
-<BitOtpInput Vertical Reversed />";
+<BitOtpInput Direction=""BitOtpInputDirection.LeftToRight"" />
+<BitOtpInput Direction=""BitOtpInputDirection.RightToLeft"" />
+<BitOtpInput Direction=""BitOtpInputDirection.TopToBottom"" />
+<BitOtpInput Direction=""BitOtpInputDirection.BottomToTop"" />";
 
     private readonly string example4RazorCode = @"
 <style>
@@ -306,10 +321,4 @@ private ValidationOtpInputModel validationOtpInputModel = new();
 
 private void HandleValidSubmit() { }
 private void HandleInvalidSubmit() { }";
-
-    private readonly string example8RazorCode = @"
-<BitOtpInput Dir=""BitDir.Rtl"" />
-<BitOtpInput Reversed Dir=""BitDir.Rtl"" />
-<BitOtpInput Vertical Dir=""BitDir.Rtl"" />
-<BitOtpInput Vertical Reversed Dir=""BitDir.Rtl"" />";
 }

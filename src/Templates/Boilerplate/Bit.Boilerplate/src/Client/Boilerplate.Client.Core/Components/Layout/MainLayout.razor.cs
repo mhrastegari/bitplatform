@@ -6,42 +6,16 @@ public partial class MainLayout : IDisposable
 {
     private bool disposed;
     private bool isMenuOpen;
-    private BitDir? currentDir;
     private bool isUserAuthenticated;
     private ErrorBoundary errorBoundaryRef = default!;
-    private Action unsubscribeCultureChange = default!;
 
-    [AutoInject] private IPubSubService pubSubService = default!;
-    [AutoInject] private AuthenticationManager authManager = default!;
-    [AutoInject] private IExceptionHandler exceptionHandler = default!;
     [AutoInject] private IPrerenderStateService prerenderStateService = default!;
 
+    [AutoInject] private IExceptionHandler exceptionHandler = default!;
+
+    [AutoInject] private AuthenticationManager authManager = default!;
+
     [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            authManager.AuthenticationStateChanged += IsUserAuthenticated;
-
-            isUserAuthenticated = await prerenderStateService.GetValue(async () => (await AuthenticationStateTask).User.IsAuthenticated());
-
-            unsubscribeCultureChange = pubSubService.Subscribe(PubSubMessages.CULTURE_CHANGED, async _ =>
-            {
-                SetCurrentDir();
-
-                StateHasChanged();
-            });
-
-            SetCurrentDir();
-
-            await base.OnInitializedAsync();
-        }
-        catch (Exception exp)
-        {
-            exceptionHandler.Handle(exp);
-        }
-    }
 
     protected override void OnParametersSet()
     {
@@ -52,19 +26,23 @@ public partial class MainLayout : IDisposable
         base.OnParametersSet();
     }
 
-    private void SetCurrentDir()
+    protected override async Task OnInitializedAsync()
     {
-        var currentCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            authManager.AuthenticationStateChanged += VerifyUserIsAuthenticatedOrNot;
 
-        currentDir = currentCulture.TextInfo.IsRightToLeft ? BitDir.Rtl : null;
+            isUserAuthenticated = await prerenderStateService.GetValue($"{nameof(MainLayout)}-isUserAuthenticated", async () => (await AuthenticationStateTask).User.IsAuthenticated());
+
+            await base.OnInitializedAsync();
+        }
+        catch (Exception exp)
+        {
+            exceptionHandler.Handle(exp);
+        }
     }
 
-    private void ToggleMenuHandler()
-    {
-        isMenuOpen = !isMenuOpen;
-    }
-
-    private async void IsUserAuthenticated(Task<AuthenticationState> task)
+    async void VerifyUserIsAuthenticatedOrNot(Task<AuthenticationState> task)
     {
         try
         {
@@ -80,20 +58,22 @@ public partial class MainLayout : IDisposable
         }
     }
 
+    private void ToggleMenuHandler()
+    {
+        isMenuOpen = !isMenuOpen;
+    }
+
     public void Dispose()
     {
         Dispose(true);
-
         GC.SuppressFinalize(this);
     }
 
     protected virtual void Dispose(bool disposing)
     {
-        if (disposed || disposing is false) return;
+        if (disposed) return;
 
-        authManager.AuthenticationStateChanged -= IsUserAuthenticated;
-
-        unsubscribeCultureChange();
+        authManager.AuthenticationStateChanged -= VerifyUserIsAuthenticatedOrNot;
 
         disposed = true;
     }

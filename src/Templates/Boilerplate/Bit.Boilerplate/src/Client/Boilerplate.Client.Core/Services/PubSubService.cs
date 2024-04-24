@@ -13,7 +13,7 @@ public partial class PubSubService : IPubSubService
     {
         if (handlers.TryGetValue(message, out var messageHandlers))
         {
-            foreach (var handler in messageHandlers.ToArray())
+            foreach (var handler in messageHandlers)
             {
                 handler(payload)
                     .ContinueWith(t => serviceProvider.GetRequiredService<IExceptionHandler>().Handle(t.Exception!), TaskContinuationOptions.OnlyOnFaulted);

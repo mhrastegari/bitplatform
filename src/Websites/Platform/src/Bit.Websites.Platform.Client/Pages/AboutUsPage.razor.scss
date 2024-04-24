@@ -64,7 +64,7 @@
 
 .values-section {
     padding-top: 5rem;
-    padding-bottom: 5rem;
+    padding-bottom: 10rem;
 
     .value-card-list {
         gap: 1rem;
@@ -100,6 +100,7 @@
 .team-section {
     padding-top: 5rem;
     padding-bottom: 5rem;
+    margin-bottom: 5rem;
 
     .member-card-list {
         gap: 1rem;
@@ -110,40 +111,28 @@
     }
 
     .member-card {
-        gap: 1rem;
-        display: flex;
-        flex-flow: row;
-        min-width: 21rem;
-        max-width: 21rem;
+        flex-grow: 0;
         padding: rem2(20px);
         border-radius: rem2(4px);
-        justify-content: flex-start;
+        min-width: rem2(275px);
+        max-width: rem2(275px);
         box-shadow: $bit-box-shadow-callout;
-    }
-
-    .member-img {
-        width: rem2(150px);
-        height: rem2(150px);
-        border-radius: rem2(4px);
     }
 
     .member-container {
         display: flex;
-        flex-flow: column;
+        flex-flow: row nowrap;
+        justify-content: space-between;
     }
 
-    .member-name {
-        margin-bottom: rem2(5px);
-    }
-
-    .member-position {
-        font-size: rem2(14px);
-        color: $bit-color-foreground-secondary;
+    .member-img {
+        width: rem2(70px);
+        height: rem2(70px);
+        border-radius: rem2(10px);
     }
 
     .contact-grp {
         display: flex;
-        margin-top: 0.5rem;
         flex-flow: row nowrap;
     }
 
@@ -163,5 +152,15 @@
 
     .twitter {
         background-image: url('/images/about-us/twitter-icon.webp');
+    }
+
+    .member-name {
+        margin-top: rem2(20px);
+        margin-bottom: rem2(5px);
+    }
+
+    .member-position {
+        font-size: rem2(14px);
+        color: $bit-color-foreground-secondary;
     }
 }

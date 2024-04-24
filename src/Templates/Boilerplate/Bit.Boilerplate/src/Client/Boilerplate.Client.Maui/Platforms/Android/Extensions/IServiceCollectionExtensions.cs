@@ -1,10 +1,10 @@
 ﻿namespace Microsoft.Extensions.DependencyInjection;
 
-public static partial class IServiceCollectionExtensions
+public static class IAndroidServiceCollectionExtensions
 {
-    public static IServiceCollection AddClientMauiProjectAndroidServices(this IServiceCollection services)
+    public static IServiceCollection AddClientAndroidServices(this IServiceCollection services)
     {
-        // Services being registered here can get injected in Maui/Android.
+        // Services registered in this class can be injected in Android.
 
         return services;
     }

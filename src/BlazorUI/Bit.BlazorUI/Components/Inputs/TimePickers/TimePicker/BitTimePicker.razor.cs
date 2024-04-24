@@ -19,10 +19,10 @@ public partial class BitTimePicker
     private int? _hour;
     private int? _minute;
     private string? _labelId;
+    private bool _isPointerDown;
     private string? _textFieldId;
     private string _timePickerId = string.Empty;
     private string _calloutId = string.Empty;
-    private CancellationTokenSource _cancellationTokenSource = new();
     private DotNetObjectReference<BitTimePicker> _dotnetObj = default!;
     private ElementReference _inputHourRef = default!;
     private ElementReference _inputMinuteRef = default!;
@@ -103,7 +103,15 @@ public partial class BitTimePicker
 
     [Inject] private IJSRuntime _js { get; set; } = default!;
 
+    /// <summary>
+    /// Label for the TimePicker
+    /// </summary>
+    [Parameter] public string? Label { get; set; }
 
+    /// <summary>
+    /// Shows the custom label for text field
+    /// </summary>
+    [Parameter] public RenderFragment? LabelTemplate { get; set; }
 
     /// <summary>
     /// Whether the TimePicker allows input a date string directly or not
@@ -111,60 +119,19 @@ public partial class BitTimePicker
     [Parameter] public bool AllowTextInput { get; set; }
 
     /// <summary>
-    /// Aria label for time picker popup for screen reader users.
+    /// The tabIndex of the TextField.
     /// </summary>
-    [Parameter] public string CalloutAriaLabel { get; set; } = "Clock";
+    [Parameter] public int TabIndex { get; set; }
 
     /// <summary>
-    /// Capture and render additional attributes in addition to the main callout's parameters
+    /// Placeholder text for the TimePicker.
     /// </summary>
-    [Parameter] public Dictionary<string, object> CalloutHtmlAttributes { get; set; } = [];
+    [Parameter] public string? Placeholder { get; set; }
 
     /// <summary>
-    /// Custom CSS classes for different parts of the BitTimePicker component.
+    /// Custom TimePicker icon template
     /// </summary>
-    [Parameter] public BitTimePickerClassStyles? Classes { get; set; }
-
-    /// <summary>
-    /// The title of the close button (tooltip).
-    /// </summary>
-    [Parameter] public string CloseButtonTitle { get; set; } = "Close time picker";
-
-    /// <summary>
-    /// CultureInfo for the TimePicker
-    /// </summary>
-    [Parameter]
-    public CultureInfo Culture
-    {
-        get => culture;
-        set
-        {
-            if (culture == value) return;
-
-            culture = value;
-            ClassBuilder.Reset();
-        }
-    }
-
-    /// <summary>
-    /// Determines the allowed drop directions of the callout.
-    /// </summary>
-    [Parameter] public BitDropDirection DropDirection { get; set; } = BitDropDirection.TopAndBottom;
-
-    /// <summary>
-    /// Determines if the TimePicker has a border.
-    /// </summary>
-    [Parameter] public bool HasBorder { get; set; } = true;
-
-    /// <summary>
-    /// Determines increment/decrement steps for time-picker's hour.
-    /// </summary>
-    [Parameter] public int HourStep { get; set; } = 1;
-
-    /// <summary>
-    /// Optional TimePicker icon
-    /// </summary>
-    [Parameter] public string IconName { get; set; } = "Clock";
+    [Parameter] public RenderFragment? IconTemplate { get; set; }
 
     /// <summary>
     /// TimePicker icon location
@@ -183,14 +150,9 @@ public partial class BitTimePicker
     }
 
     /// <summary>
-    /// Custom TimePicker icon template
+    /// Optional TimePicker icon
     /// </summary>
-    [Parameter] public RenderFragment? IconTemplate { get; set; }
-
-    /// <summary>
-    /// The custom validation error message for the invalid value.
-    /// </summary>
-    [Parameter] public string? InvalidErrorMessage { get; set; }
+    [Parameter] public string IconName { get; set; } = "Clock";
 
     /// <summary>
     /// Whether or not this TimePicker is open
@@ -212,29 +174,19 @@ public partial class BitTimePicker
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
 
     /// <summary>
+    /// Capture and render additional attributes in addition to the main callout's parameters
+    /// </summary>
+    [Parameter] public Dictionary<string, object> CalloutHtmlAttributes { get; set; } = [];
+
+    /// <summary>
+    /// Aria label for time picker popup for screen reader users.
+    /// </summary>
+    [Parameter] public string CalloutAriaLabel { get; set; } = "Clock";
+
+    /// <summary>
     /// Enables the responsive mode in small screens
     /// </summary>
     [Parameter] public bool IsResponsive { get; set; }
-
-    /// <summary>
-    /// Whether or not the Text field of the TimePicker is underlined.
-    /// </summary>
-    [Parameter] public bool IsUnderlined { get; set; }
-
-    /// <summary>
-    /// Label for the TimePicker
-    /// </summary>
-    [Parameter] public string? Label { get; set; }
-
-    /// <summary>
-    /// Shows the custom label for text field
-    /// </summary>
-    [Parameter] public RenderFragment? LabelTemplate { get; set; }
-
-    /// <summary>
-    /// Determines increment/decrement steps for time-picker's minute.
-    /// </summary>
-    [Parameter] public int MinuteStep { get; set; } = 1;
 
     /// <summary>
     /// Callback for when clicking on TimePicker input
@@ -257,24 +209,30 @@ public partial class BitTimePicker
     [Parameter] public EventCallback OnFocusOut { get; set; }
 
     /// <summary>
-    /// Callback for when the time changes.
+    /// Whether or not the Text field of the TimePicker is underlined.
     /// </summary>
-    [Parameter] public EventCallback<TimeSpan?> OnSelectTime { get; set; }
+    [Parameter] public bool IsUnderlined { get; set; }
 
     /// <summary>
-    /// Placeholder text for the TimePicker.
+    /// Determines if the TimePicker has a border.
     /// </summary>
-    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public bool HasBorder { get; set; } = true;
 
     /// <summary>
-    /// Custom CSS styles for different parts of the BitTimePicker component.
+    /// CultureInfo for the TimePicker
     /// </summary>
-    [Parameter] public BitTimePickerClassStyles? Styles { get; set; }
+    [Parameter]
+    public CultureInfo Culture
+    {
+        get => culture;
+        set
+        {
+            if (culture == value) return;
 
-    /// <summary>
-    /// The tabIndex of the TextField.
-    /// </summary>
-    [Parameter] public int TabIndex { get; set; }
+            culture = value;
+            ClassBuilder.Reset();
+        }
+    }
 
     /// <summary>
     /// The time format of the time-picker, 24H or 12H.
@@ -285,6 +243,21 @@ public partial class BitTimePicker
     /// The format of the time in the time-picker
     /// </summary>
     [Parameter] public string? ValueFormat { get; set; }
+
+    /// <summary>
+    /// The custom validation error message for the invalid value.
+    /// </summary>
+    [Parameter] public string? InvalidErrorMessage { get; set; }
+
+    /// <summary>
+    /// Callback for when the time changes.
+    /// </summary>
+    [Parameter] public EventCallback<TimeSpan?> OnSelectTime { get; set; }
+
+    /// <summary>
+    /// Determines the allowed drop directions of the callout.
+    /// </summary>
+    [Parameter] public BitDropDirection DropDirection { get; set; } = BitDropDirection.TopAndBottom;
 
 
     [JSInvokable("CloseCallout")]
@@ -303,8 +276,6 @@ public partial class BitTimePicker
 
     protected override void RegisterCssClasses()
     {
-        ClassBuilder.Register(() => Classes?.Root);
-
         ClassBuilder.Register(() => IconLocation is BitIconLocation.Left ? $"{RootElementClass}-lic" : string.Empty);
 
         ClassBuilder.Register(() => IsUnderlined ? $"{RootElementClass}-und" : string.Empty);
@@ -312,11 +283,6 @@ public partial class BitTimePicker
         ClassBuilder.Register(() => HasBorder is false ? $"{RootElementClass}-nbd" : string.Empty);
 
         ClassBuilder.Register(() => _focusClass);
-    }
-
-    protected override void RegisterCssStyles()
-    {
-        StyleBuilder.Register(() => Styles?.Root);
     }
 
     protected override void OnInitialized()
@@ -463,24 +429,25 @@ public partial class BitTimePicker
     {
         if (isNext)
         {
-            _hour += HourStep;
+            if (_hour < 23)
+            {
+                _hour++;
+            }
+            else
+            {
+                _hour = 0;
+            }
         }
         else
         {
-            _hour -= HourStep;
-        }
-
-        if (_hour.HasValue is false)
-        {
-            _hour = 0;
-        }
-        else if (_hour > 23)
-        {
-            _hour -= 24;
-        }
-        else if (_hour < 0)
-        {
-            _hour += 24;
+            if (_hour > 0)
+            {
+                _hour--;
+            }
+            else
+            {
+                _hour = 23;
+            }
         }
 
         await UpdateCurrentValue();
@@ -490,24 +457,25 @@ public partial class BitTimePicker
     {
         if (isNext)
         {
-            _minute += MinuteStep;
+            if (_minute < 59)
+            {
+                _minute++;
+            }
+            else
+            {
+                _minute = 0;
+            }
         }
         else
         {
-            _minute -= MinuteStep;
-        }
-
-        if (_minute.HasValue is false)
-        {
-            _minute = 0;
-        }
-        else if (_minute > 59)
-        {
-            _minute -= 60;
-        }
-        else if (_minute < 0)
-        {
-            _minute += 60;
+            if (_minute > 0)
+            {
+                _minute--;
+            }
+            else
+            {
+                _minute = 59;
+            }
         }
 
         await UpdateCurrentValue();
@@ -517,34 +485,15 @@ public partial class BitTimePicker
     {
         if (IsEnabled is false) return;
 
-        await ChangeTime(isNext, isHour);
-        ResetCts();
+        _isPointerDown = true;
 
-        var cts = _cancellationTokenSource;
-        await Task.Run(async () =>
-        {
-            await InvokeAsync(async () =>
-            {
-                await Task.Delay(INITIAL_STEP_DELAY);
-                await ContinuousChangeTime(isNext, isHour, cts);
-            });
-        }, cts.Token);
+        await ChangeTime(isNext, isHour, INITIAL_STEP_DELAY);
     }
 
-    private async Task ContinuousChangeTime(bool isNext, bool isHour, CancellationTokenSource cts)
+    private async Task ChangeTime(bool isNext, bool isHour, int stepDelay)
     {
-        if (cts.IsCancellationRequested) return;
+        if (_isPointerDown is false) return;
 
-        await ChangeTime(isNext, isHour);
-
-        StateHasChanged();
-
-        await Task.Delay(STEP_DELAY);
-        await ContinuousChangeTime(isNext, isHour, cts);
-    }
-
-    private async Task ChangeTime(bool isNext, bool isHour)
-    {
         if (isHour)
         {
             await ChangeHour(isNext);
@@ -553,18 +502,16 @@ public partial class BitTimePicker
         {
             await ChangeMinute(isNext);
         }
+        StateHasChanged();
+
+        await Task.Delay(stepDelay);
+
+        await ChangeTime(isNext, isHour, STEP_DELAY);
     }
 
     private void HandleOnPointerUpOrOut()
     {
-        ResetCts();
-    }
-
-    private void ResetCts()
-    {
-        _cancellationTokenSource.Cancel();
-        _cancellationTokenSource.Dispose();
-        _cancellationTokenSource = new();
+        _isPointerDown = false;
     }
 
     private string GetValueFormat()
@@ -611,7 +558,6 @@ public partial class BitTimePicker
         if (disposing)
         {
             _dotnetObj.Dispose();
-            _cancellationTokenSource.Dispose();
             OnValueChanged -= HandleOnValueChanged;
         }
 

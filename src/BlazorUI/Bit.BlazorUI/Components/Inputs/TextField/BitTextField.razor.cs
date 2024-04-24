@@ -11,15 +11,16 @@ public partial class BitTextField
     private bool isUnderlined;
     private bool isResizable = true;
     private BitTextFieldType type = BitTextFieldType.Text;
+    private string focusClass = string.Empty;
 
-    private bool _hasFocus;
-    private bool _isPasswordRevealed;
-    private BitTextFieldType _elementType;
-    private string _inputId = string.Empty;
-    private string _labelId = string.Empty;
-    private string _inputType = string.Empty;
-    private string _descriptionId = string.Empty;
     private ElementReference _inputRef = default!;
+    private string _inputId = string.Empty;
+    private string _inputType = string.Empty;
+    private string _labelId = string.Empty;
+    private string _descriptionId = string.Empty;
+    private bool _isPasswordRevealed;
+    private bool _hasFocus;
+    private BitTextFieldType _elementType;
 
     /// <summary>
     /// AutoComplete is a string that maps to the autocomplete attribute of the HTML input element.
@@ -270,17 +271,6 @@ public partial class BitTextField
             ClassBuilder.Reset();
         }
     }
-
-
-    /// <summary>
-    /// The ElementReference to the input element of the BitTextField.
-    /// </summary>
-    public ElementReference InputElement => _inputRef;
-
-    /// <summary>
-    /// Gives focus to the input element of the BitTextField.
-    /// </summary>
-    public ValueTask FocusAsync() => _inputRef.FocusAsync();
 
 
 

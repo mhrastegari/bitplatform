@@ -19,7 +19,6 @@ public partial class BitDatePicker
     private bool hasBorder = true;
     private CultureInfo culture = CultureInfo.CurrentUICulture;
     private BitIconLocation iconLocation = BitIconLocation.Right;
-    private CancellationTokenSource _cancellationTokenSource = new();
 
     private string focusClass = string.Empty;
     private string _focusClass
@@ -101,6 +100,7 @@ public partial class BitDatePicker
     private int _currentDay;
     private int _currentYear;
     private int _currentMonth;
+    private bool _isPointerDown;
     private int? _selectedDateWeek;
     private int _yearPickerEndYear;
     private int _yearPickerStartYear;
@@ -112,13 +112,12 @@ public partial class BitDatePicker
     private bool _isTimePickerOverlayOnTop;
     private bool _showTimePickerAsOverlayInternal;
     private DotNetObjectReference<BitDatePicker> _dotnetObj = default!;
-    private readonly int[,] _daysOfCurrentMonth = new int[DEFAULT_WEEK_COUNT, DEFAULT_DAY_COUNT_PER_WEEK];
+    private int[,] _daysOfCurrentMonth = new int[DEFAULT_WEEK_COUNT, DEFAULT_DAY_COUNT_PER_WEEK];
 
     private string _datePickerId = string.Empty;
     private string _calloutId = string.Empty;
     private string? _labelId;
     private string? _inputId;
-    private ElementReference _inputRef = default!;
     private ElementReference _inputTimeHourRef = default!;
     private ElementReference _inputTimeMinuteRef = default!;
 
@@ -384,9 +383,9 @@ public partial class BitDatePicker
     [Parameter] public EventCallback OnFocusOut { get; set; }
 
     /// <summary>
-    /// The callback for when the value changes in the DatePicker.
+    /// The callback for selecting a date in the DatePicker.
     /// </summary>
-    [Parameter] public EventCallback<DateTimeOffset?> OnChange { get; set; }
+    [Parameter] public EventCallback<DateTimeOffset?> OnSelectDate { get; set; }
 
     /// <summary>
     /// The text of selected date aria-atomic of the DatePicker.
@@ -468,21 +467,6 @@ public partial class BitDatePicker
     /// </summary>
     [Parameter] public bool ShowTimePickerAsOverlay { get; set; }
 
-    /// <summary>
-    /// Whether the clear button should be shown or not when the BitDatePicker has a value.
-    /// </summary>
-    [Parameter] public bool ShowClearButton { get; set; }
-
-    /// <summary>
-    /// Determines increment/decrement steps for date-picker's hour.
-    /// </summary>
-    [Parameter] public int HourStep { get; set; } = 1;
-
-    /// <summary>
-    /// Determines increment/decrement steps for date-picker's minute.
-    /// </summary>
-    [Parameter] public int MinuteStep { get; set; } = 1;
-
 
     public Task OpenCallout()
     {
@@ -496,7 +480,7 @@ public partial class BitDatePicker
     {
         ClassBuilder.Register(() => Classes?.Root);
 
-        ClassBuilder.Register(() => (Dir is null && Culture.TextInfo.IsRightToLeft) ? "bit-rtl" : string.Empty);
+        ClassBuilder.Register(() => Culture.TextInfo.IsRightToLeft ? $"{RootElementClass}-rtl" : string.Empty);
 
         ClassBuilder.Register(() => IconLocation is BitIconLocation.Left ? $"{RootElementClass}-lic" : string.Empty);
 
@@ -658,22 +642,7 @@ public partial class BitDatePicker
             }
         }
 
-        await OnChange.InvokeAsync(CurrentValue);
-    }
-
-    private async Task HandleOnClearButtonClick()
-    {
-        if (IsEnabled is false) return;
-
-        CurrentValue = null;
-
-        _hour = 0;
-        _minute = 0;
-
-        _selectedDateWeek = null;
-        _selectedDateDayOfWeek = null;
-
-        await _inputRef.FocusAsync();
+        await OnSelectDate.InvokeAsync(CurrentValue);
     }
 
     private async Task SelectDate(int dayIndex, int weekIndex)
@@ -687,14 +656,12 @@ public partial class BitDatePicker
         int selectedMonth = FindMonth(weekIndex, dayIndex);
         var isNotInCurrentMonth = IsInCurrentMonth(weekIndex, dayIndex) is false;
 
-        //The number of days displayed in the picker is about 34 days, and if the selected day is less than 15, it means that the next month has been selected in next year.
-        if (selectedMonth < _currentMonth && _currentMonth == 12 && isNotInCurrentMonth && _currentDay < 15)
+        if (selectedMonth < _currentMonth && _currentMonth == 12 && isNotInCurrentMonth)
         {
             _currentYear++;
         }
 
-        //The number of days displayed in the picker is about 34 days, and if the selected day is greater than 15, it means that the previous month has been selected in previous year.
-        if (selectedMonth > _currentMonth && _currentMonth == 1 && isNotInCurrentMonth && _currentDay > 15)
+        if (selectedMonth > _currentMonth && _currentMonth == 1 && isNotInCurrentMonth)
         {
             _currentYear--;
         }
@@ -712,7 +679,7 @@ public partial class BitDatePicker
 
         GenerateMonthData(_currentYear, _currentMonth);
 
-        await OnChange.InvokeAsync(CurrentValue);
+        await OnSelectDate.InvokeAsync(CurrentValue);
     }
 
     private void SelectMonth(int month)
@@ -1228,7 +1195,7 @@ public partial class BitDatePicker
         var currentValueDay = Culture.Calendar.GetDayOfMonth(CurrentValue.Value.LocalDateTime);
         CurrentValue = new DateTimeOffset(Culture.Calendar.ToDateTime(currentValueYear, currentValueMonth, currentValueDay, _hour, _minute, 0, 0), DateTimeOffset.Now.Offset);
 
-        await OnChange.InvokeAsync(CurrentValue);
+        await OnSelectDate.InvokeAsync(CurrentValue);
     }
 
     private async Task HandleOnTimeHourFocus()
@@ -1280,34 +1247,15 @@ public partial class BitDatePicker
     {
         if (IsEnabled is false) return;
 
-        await ChangeTime(isNext, isHour);
-        ResetCts();
+        _isPointerDown = true;
 
-        var cts = _cancellationTokenSource;
-        await Task.Run(async () =>
-        {
-            await InvokeAsync(async () =>
-            {
-                await Task.Delay(INITIAL_STEP_DELAY);
-                await ContinuousChangeTime(isNext, isHour, cts);
-            });
-        }, cts.Token);
+        await ChangeTime(isNext, isHour, INITIAL_STEP_DELAY);
     }
 
-    private async Task ContinuousChangeTime(bool isNext, bool isHour, CancellationTokenSource cts)
+    private async Task ChangeTime(bool isNext, bool isHour, int stepDelay)
     {
-        if (cts.IsCancellationRequested) return;
+        if (_isPointerDown is false) return;
 
-        await ChangeTime(isNext, isHour);
-
-        StateHasChanged();
-
-        await Task.Delay(STEP_DELAY);
-        await ContinuousChangeTime(isNext, isHour, cts);
-    }
-
-    private async Task ChangeTime(bool isNext, bool isHour)
-    {
         if (isHour)
         {
             await ChangeHour(isNext);
@@ -1316,38 +1264,41 @@ public partial class BitDatePicker
         {
             await ChangeMinute(isNext);
         }
+        StateHasChanged();
+
+        await Task.Delay(stepDelay);
+
+        await ChangeTime(isNext, isHour, STEP_DELAY);
     }
 
     private void HandleOnPointerUpOrOut()
     {
-        ResetCts();
-    }
-
-    private void ResetCts()
-    {
-        _cancellationTokenSource.Cancel();
-        _cancellationTokenSource.Dispose();
-        _cancellationTokenSource = new();
+        _isPointerDown = false;
     }
 
     private async Task ChangeHour(bool isNext)
     {
         if (isNext)
         {
-            _hour += HourStep;
+            if (_hour < 23)
+            {
+                _hour++;
+            }
+            else
+            {
+                _hour = 0;
+            }
         }
         else
         {
-            _hour -= HourStep;
-        }
-
-        if (_hour > 23)
-        {
-            _hour -= 24;
-        }
-        else if (_hour < 0)
-        {
-            _hour += 24;
+            if (_hour > 0)
+            {
+                _hour--;
+            }
+            else
+            {
+                _hour = 23;
+            }
         }
 
         await UpdateCurrentValue();
@@ -1357,20 +1308,25 @@ public partial class BitDatePicker
     {
         if (isNext)
         {
-            _minute += MinuteStep;
+            if (_minute < 59)
+            {
+                _minute++;
+            }
+            else
+            {
+                _minute = 0;
+            }
         }
         else
         {
-            _minute -= MinuteStep;
-        }
-
-        if (_minute > 59)
-        {
-            _minute -= 60;
-        }
-        else if (_minute < 0)
-        {
-            _minute += 60;
+            if (_minute > 0)
+            {
+                _minute--;
+            }
+            else
+            {
+                _minute = 59;
+            }
         }
 
         await UpdateCurrentValue();
@@ -1464,7 +1420,6 @@ public partial class BitDatePicker
         if (disposing)
         {
             _dotnetObj.Dispose();
-            _cancellationTokenSource.Dispose();
         }
 
         base.Dispose(disposing);

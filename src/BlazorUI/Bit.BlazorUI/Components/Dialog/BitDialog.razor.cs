@@ -215,7 +215,7 @@ public partial class BitDialog : IDisposable
     {
         StyleBuilder.Register(() => Styles?.Root);
 
-        StyleBuilder.Register(() => _offsetTop > 0 ? FormattableString.Invariant($"top:{_offsetTop}px") : string.Empty);
+        StyleBuilder.Register(() => _offsetTop > 0 ? $"top:{_offsetTop}px" : string.Empty);
     }
 
     protected override Task OnInitializedAsync()
@@ -237,16 +237,16 @@ public partial class BitDialog : IDisposable
         {
             if (IsDraggable)
             {
-                _ = _js.BitModalSetupDragDrop(_containerId, GetDragElementSelector());
+                _ = _js.SetupDragDrop(_containerId, GetDragElementSelector());
             }
             else
             {
-                _ = _js.BitModalRemoveDragDrop(_containerId, GetDragElementSelector());
+                _ = _js.RemoveDragDrop(_containerId, GetDragElementSelector());
             }
         }
         else
         {
-            _ = _js.BitModalRemoveDragDrop(_containerId, GetDragElementSelector());
+            _ = _js.RemoveDragDrop(_containerId, GetDragElementSelector());
         }
 
         _offsetTop = 0;
@@ -340,7 +340,7 @@ public partial class BitDialog : IDisposable
     {
         if (_disposed || disposing is false) return;
 
-        _ = _js.BitModalRemoveDragDrop(_containerId, GetDragElementSelector());
+        _ = _js.RemoveDragDrop(_containerId, GetDragElementSelector());
 
         _tcs?.SetResult(Result = null);
         _tcs = null;

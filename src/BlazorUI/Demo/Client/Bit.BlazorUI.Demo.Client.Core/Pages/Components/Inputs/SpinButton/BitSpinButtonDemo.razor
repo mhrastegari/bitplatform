@@ -9,8 +9,7 @@
                ComponentDescription="A spin button (SpinButton) allows someone to incrementally adjust a value in small steps. It’s mainly used for numeric values, but other values are supported too."
                ComponentParameters="componentParameters"
                ComponentSubClasses="componentSubClasses"
-               ComponentSubEnums="componentSubEnums"
-               ComponentPublicMembers="componentPublicMembers">
+               ComponentSubEnums="componentSubEnums">
     <ComponentExampleBox Title="Basic" RazorCode="@example1RazorCode" Id="example1">
         <ExamplePreview>
             <div class="example-box">
@@ -69,12 +68,12 @@
                 <div>LabelPosition:</div>
                 <br />
                 <BitSpinButton Label="Top (default)" />
-                <br />                
-                <BitSpinButton Label="Start" LabelPosition="BitLabelPosition.Start" />
                 <br />
-                <BitSpinButton Label="End" LabelPosition="BitLabelPosition.End" />
+                <BitSpinButton Label="Left Label" LabelPosition="BitSpinButtonLabelPosition.Left" />
                 <br />
-                <BitSpinButton Label="Bottom" LabelPosition="BitLabelPosition.Bottom" />
+                <BitSpinButton Label="Right Label" LabelPosition="BitSpinButtonLabelPosition.Right" />
+                <br />
+                <BitSpinButton Label="Bottom Label" LabelPosition="BitSpinButtonLabelPosition.Bottom" />
                 <br /><br /><br />
                 <div>LabelTemplate:</div>
                 <br />

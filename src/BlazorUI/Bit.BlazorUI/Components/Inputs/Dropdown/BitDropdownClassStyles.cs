@@ -83,21 +83,6 @@ public class BitDropdownClassStyles
     public string? SearchBoxInput { get; set; }
 
     /// <summary>
-    /// Custom CSS classes/styles for the ComboBox input of the BitDropdown.
-    /// </summary>
-    public string? ComboBoxInput { get; set; }
-
-    /// <summary>
-    /// Custom CSS classes/styles for the chips container of the BitDropdown.
-    /// </summary>
-    public string? Chips { get; set; }
-
-    /// <summary>
-    /// Custom CSS classes/styles for the chips's remove icon of the BitDropdown.
-    /// </summary>
-    public string? ChipsRemoveIcon { get; set; }
-
-    /// <summary>
     /// Custom CSS classes/styles for the search box's clear button container of the BitDropdown.
     /// </summary>
     public string? SearchBoxClearButtonContainer { get; set; }
@@ -151,34 +136,4 @@ public class BitDropdownClassStyles
     /// Custom CSS classes/styles for the item divider of the BitDropdown.
     /// </summary>
     public string? ItemDivider { get; set; }
-
-    /// <summary>
-    /// Custom CSS classes/styles for the dropdown's prefix container.
-    /// </summary>
-    public string? PrefixContainer { get; set; }
-
-    /// <summary>
-    /// Custom CSS classes/styles for the dropdown's prefix.
-    /// </summary>
-    public string? Prefix { get; set; }
-
-    /// <summary>
-    /// Custom CSS classes/styles for the dropdown's suffix container.
-    /// </summary>
-    public string? SuffixContainer { get; set; }
-
-    /// <summary>
-    /// Custom CSS classes/styles for the dropdown's suffix.
-    /// </summary>
-    public string? Suffix { get; set; }
-
-    /// <summary>
-    /// Custom CSS classes/styles for the ComboBox input container in responsive mode of the BitDropdown.
-    /// </summary>
-    public string? ResponsiveComboInputContainer { get; set; }
-
-    /// <summary>
-    /// Custom CSS classes/styles for the add new item combo box button in responsive mode of the BitDropdown.
-    /// </summary>
-    public string? ResponsiveComboAddButton { get; set; }
 }

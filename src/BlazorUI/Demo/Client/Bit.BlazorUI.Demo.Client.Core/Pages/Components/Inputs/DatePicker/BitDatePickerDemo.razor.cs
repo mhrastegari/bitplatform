@@ -258,9 +258,9 @@ public partial class BitDatePickerDemo
         },
         new()
         {
-            Name = "OnChange",
+            Name = "OnSelectDate",
             Type = "EventCallback<DateTimeOffset?>",
-            Description = "The callback for when the value changes in the DatePicker."
+            Description = "The callback for selecting a date in the DatePicker."
         },
         new()
         {
@@ -275,13 +275,6 @@ public partial class BitDatePickerDemo
             Type = "string",
             DefaultValue = "Selected date {0}",
             Description = "The text of selected date aria-atomic of the calendar."
-        },
-        new()
-        {
-            Name = "ShowClearButton",
-            Type = "bool",
-            DefaultValue = "false",
-            Description = "Whether the clear button should be shown or not when the BitDatePicker has a value."
         },
         new()
         {
@@ -370,20 +363,6 @@ public partial class BitDatePickerDemo
             Type = "string",
             DefaultValue = "{0} - {1}, change month",
             Description = "The title of the year range picker's toggle (tooltip)."
-        },
-        new()
-        {
-            Name = "HourStep",
-            Type = "int",
-            DefaultValue = "1",
-            Description = "Determines increment/decrement steps for date-picker's hour.",
-        },
-        new()
-        {
-            Name = "MinuteStep",
-            Type = "int",
-            DefaultValue = "1",
-            Description = "Determines increment/decrement steps for date-picker's minute.",
         }
     };
 
@@ -922,8 +901,7 @@ public partial class BitDatePickerDemo
 <BitDatePicker Label=""PlaceHolder"" Placeholder=""Select a date"" />
 <BitDatePicker Label=""Week numbers"" ShowWeekNumbers=""true"" />
 <BitDatePicker Label=""Highlight months"" HighlightCurrentMonth=""true"" HighlightSelectedMonth=""true"" />
-<BitDatePicker Label=""TimePicker"" ShowTimePicker=""true"" />
-<BitDatePicker Label=""Show clear button when has a value"" ShowClearButton=""true"" />";
+<BitDatePicker Label=""TimePicker"" ShowTimePicker=""true"" />";
 
     private readonly string example2RazorCode = @"
 <BitDatePicker MinDate=""DateTimeOffset.Now.AddDays(-5)"" MaxDate=""DateTimeOffset.Now.AddDays(5)"" />
@@ -1155,16 +1133,4 @@ private BitDatePickerValidationModel validationModel = new();
 
 private void HandleValidSubmit() { }
 private void HandleInvalidSubmit() { }";
-
-    private readonly string example11RazorCode = @"
-<BitDatePicker Dir=""BitDir.Rtl"" />";
-
-    private readonly string example12RazorCode = @"
-<BitDatePicker ShowTimePicker=""true""
-               Label=""HourStep = 2""
-               HourStep=""2"" />
-
-<BitDatePicker ShowTimePicker=""true""
-               Label=""MinuteStep = 15""
-               MinuteStep=""15"" />";
 }

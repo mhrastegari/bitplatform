@@ -24,7 +24,7 @@ public partial class BitColorPicker : IDisposable
 
 
 
-    [Inject] private IJSRuntime _js { get; set; } = default!;
+    [Inject] public IJSRuntime _js { get; set; } = default!;
 
 
 
@@ -94,8 +94,8 @@ public partial class BitColorPicker : IDisposable
 
 
     public string? Hex => _color.Hex;
-    public string? Rgb => FormattableString.Invariant($"rgb({_color.R},{_color.G},{_color.B})");
-    public string? Rgba => FormattableString.Invariant($"rgba({_color.R},{_color.G},{_color.B},{_color.A})");
+    public string? Rgb => $"rgb({_color.R},{_color.G},{_color.B})";
+    public string? Rgba => $"rgba({_color.R},{_color.G},{_color.B},{_color.A})";
     public (double Hue, double Saturation, double Value) Hsv => _color.Hsv;
 
 
@@ -117,8 +117,8 @@ public partial class BitColorPicker : IDisposable
 
         if (firstRender is false) return;
 
-        _pointerUpAbortControllerId = await _js.BitColorPickerRegisterPointerUp(_dotnetObj, "HandlePointerUp");
-        _pointerMoveAbortControllerId = await _js.BitColorPickerRegisterPointerMove(_dotnetObj, "HandlePointerMove");
+        _pointerUpAbortControllerId = await _js.RegisterPointerUp(_dotnetObj, "HandlePointerUp");
+        _pointerMoveAbortControllerId = await _js.RegisterPointerMove(_dotnetObj, "HandlePointerMove");
 
         await SetSaturationPickerThumbPositionAsync();
     }
@@ -252,8 +252,8 @@ public partial class BitColorPicker : IDisposable
     {
         if (_disposed || disposing is false) return;
 
-        _ = _js.BitColorPickerAbort(_pointerUpAbortControllerId);
-        _ = _js.BitColorPickerAbort(_pointerMoveAbortControllerId);
+        _ = _js.AbortProcedure(_pointerUpAbortControllerId);
+        _ = _js.AbortProcedure(_pointerMoveAbortControllerId);
 
         _disposed = true;
     }

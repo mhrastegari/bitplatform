@@ -2,7 +2,6 @@
 //#if (offlineDb == true)
 using Boilerplate.Client.Core.Data;
 //#endif
-using System.Diagnostics.CodeAnalysis;
 using Boilerplate.Client.Core.Services.HttpMessageHandlers;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
 
@@ -10,9 +9,9 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class IServiceCollectionExtensions
 {
-    public static IServiceCollection AddClientCoreProjectServices(this IServiceCollection services)
+    public static IServiceCollection AddClientSharedServices(this IServiceCollection services)
     {
-        // Services being registered here can get injected in client side (Web, Android, iOS, Windows, macOS) and server side (during pre rendering)
+        // Services registered in this class can be injected in client side (Web, Android, iOS, Windows, macOS)
 
         services.TryAddTransient<IPrerenderStateService, PrerenderStateService>();
 
@@ -20,14 +19,14 @@ public static class IServiceCollectionExtensions
         services.TryAddTransient<IAuthTokenProvider, ClientSideAuthTokenProvider>();
         services.TryAddTransient<IStorageService, BrowserStorageService>();
 
-        services.TryAddKeyedTransient<DelegatingHandler, RequestHeadersDelegationHandler>("DefaultMessageHandler");
+        services.TryAddKeyedTransient<HttpMessageHandler, RequestHeadersDelegationHandler>("DefaultMessageHandler");
         services.TryAddTransient<AuthDelegatingHandler>();
         services.TryAddTransient<RetryDelegatingHandler>();
         services.TryAddTransient<ExceptionDelegatingHandler>();
-        services.TryAddSessioned<HttpClientHandler>();
+        services.TryAddTransient<HttpClientHandler>();
 
-        services.AddSessioned<AuthenticationStateProvider, AuthenticationManager>(); // Use 'Add' instead of 'TryAdd' to override the aspnetcore's default AuthenticationStateProvider.
-        services.TryAddSessioned(sp => (AuthenticationManager)sp.GetRequiredService<AuthenticationStateProvider>());
+        services.AddScoped<AuthenticationStateProvider, AuthenticationManager>();
+        services.AddScoped(sp => (AuthenticationManager)sp.GetRequiredService<AuthenticationStateProvider>());
 
         services.TryAddTransient<MessageBoxService>();
         services.TryAddTransient<LazyAssemblyLoader>();
@@ -37,12 +36,11 @@ public static class IServiceCollectionExtensions
 
         services.AddBitButilServices();
         services.AddBitBlazorUIServices();
+        services.AddSharedServices();
 
         //#if (offlineDb == true)
         services.AddBesqlDbContextFactory<OfflineDbContext>();
         //#endif
-
-        services.AddSharedProjectServices();
         return services;
     }
 
@@ -81,39 +79,5 @@ public static class IServiceCollectionExtensions
         }
 
         return services;
-    }
-
-    /// <summary>
-    /// <inheritdoc cref="AddSessioned{TService, TImplementation}(IServiceCollection)"/>
-    /// </summary>
-    public static IServiceCollection TryAddSessioned<TService>(this IServiceCollection services, Func<IServiceProvider, TService> implementationFactory)
-        where TService : class
-    {
-        if (AppRenderMode.IsBlazorHybrid || OperatingSystem.IsBrowser())
-        {
-            services.TryAdd(ServiceDescriptor.Singleton(implementationFactory));
-        }
-        else
-        {
-            services.TryAdd(ServiceDescriptor.Scoped(implementationFactory));
-        }
-
-        return services;
-    }
-
-    /// <summary>
-    /// <inheritdoc cref="AddSessioned{TService, TImplementation}(IServiceCollection)"/>
-    /// </summary>
-    public static void TryAddSessioned<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TService>(this IServiceCollection services)
-        where TService : class
-    {
-        if (AppRenderMode.IsBlazorHybrid || OperatingSystem.IsBrowser())
-        {
-            services.TryAddSingleton(typeof(TService), typeof(TService));
-        }
-        else
-        {
-            services.TryAddScoped(typeof(TService), typeof(TService));
-        }
     }
 }

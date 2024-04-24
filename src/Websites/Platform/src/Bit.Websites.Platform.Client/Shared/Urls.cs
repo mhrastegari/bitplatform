@@ -23,8 +23,6 @@ public static class Urls
     public const string Templates = "/templates/overview";
 
     public const string Bswup = "/bswup/overview";
-    public const string Besql = "/besql/overview";
-    public const string Butil = "/butil/overview";
 
     public const string BoilerplateNuget = "https://www.nuget.org/packages/Bit.Boilerplate/";
 
@@ -40,7 +38,8 @@ public static class Urls
     public const string AdminPanelAppleStore = "https://apps.apple.com/us/app/bit-adminpanel/id6450611349";
     public const string AdminPanelFigma = "https://www.figma.com/community/file/1161030350747233731";
 
-    public const string BlazorUI = "https://blazorui.bitplatform.dev/";
+    public const string Components = "https://components.bitplatform.dev/";
+    public const string ComponentsDocs = "https://components.bitplatform.dev/";
 
     public const string CloudHostingSolutions = "/cloud-hosting-solutions";
     public const string Support = "/support";

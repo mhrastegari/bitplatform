@@ -15,7 +15,7 @@
         <ApplicationTitle>Boilerplate</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.bitplatform.template</ApplicationId>
+        <ApplicationId>com.bitplatform.BP.Template</ApplicationId>
         <ApplicationIdGuid>AC87AA5B-4B37-4E52-8468-2D5DF24AF256</ApplicationIdGuid>
 
         <!-- Versions -->
@@ -53,24 +53,20 @@
         <!-- dotnet remove package Mono.AotProfiler.Android -->
     </ItemGroup>
 
-    <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
-        <BundleResource Include="Platforms\iOS\PrivacyInfo.xcprivacy" LogicalName="PrivacyInfo.xcprivacy" />
-    </ItemGroup>
-
     <ItemGroup>
 
         <Using Include="Microsoft.AspNetCore.Components.WebView.Maui" />
         <Using Include="Boilerplate.Client.Core.Components.Layout" />
         <Using Include="Boilerplate.Client.Core.Services.Contracts" />
         <Using Include="Boilerplate.Client.Core.Services" />
-        <Watch Remove="*.scss" />
+
     </ItemGroup>
 
     <ItemGroup>
 
         <!-- App icon for all platforms -->
         <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#0065EF" />
-
+        
         <!-- Customize App icon for Android -->
         <MauiIcon Condition="$(TargetFramework.Contains('-android'))" Update="Resources\AppIcon\appicon.svg" Color="#0065EF" ForegroundScale="0.68" />
 
@@ -88,10 +84,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bit.CodeAnalyzers" Version="8.8.1" PrivateAssets="all" />
-        <PackageReference Include="Bit.SourceGenerators" Version="8.8.1" PrivateAssets="all" />
-        <Content Remove="compilerconfig.json" />
-        <None Include="compilerconfig.json" />
+        <PackageReference Include="Bit.CodeAnalyzers" Version="8.7.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Bit.SourceGenerators" Version="8.7.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <Content Remove="Properties\launchSettings.json" />
     </ItemGroup>
 
@@ -100,20 +100,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.20" />
-        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.20" />
-        <PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.20" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.20" />
-		<PackageReference Include="Oscore.Maui.Android.InAppUpdates" Version="1.1.0" />
-        <PackageReference Include="Oscore.Maui.AppStoreInfo" Version="1.0.7" />
-        <PackageReference Include="Oscore.Maui.InAppReviews" Version="1.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.EventLog" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.EventSource" Version="8.0.0" />
-        <!--/+:msbuild-conditional:noEmit -->
-        <PackageReference Condition=" '$(appInsights)' == 'true' OR '$(appInsights)' == '' " Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.22.0" />
-        <!--/-:msbuild-conditional:noEmit -->
+        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.3" />
+        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.3" />
+        <PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.3" />
     </ItemGroup>
 
     <!-- Build Properties must be defined within these property groups to ensure successful publishing
@@ -126,11 +116,5 @@
         <CodesignEntitlements>Platforms/MacCatalyst/Entitlements.Release.plist</CodesignEntitlements>
         <UseHardenedRuntime>true</UseHardenedRuntime>
     </PropertyGroup>
-
-    <Target Name="BeforeBuildTasks" BeforeTargets="BeforeBuild">
-        <Error Text="Enable long paths in Windows. https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=powershell#enable-long-paths-in-windows-10-version-1607-and-later" Condition=" $([MSBuild]::IsOSPlatform('windows')) AND $([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem', 'LongPathsEnabled', null, RegistryView.Registry64)) != '1' " />
-        <Exec Condition="!Exists('node_modules/.bin/sass')" Command="npm install sass@1.72.0 --no-save --prefix $(MSBuildProjectDirectory)" StandardOutputImportance="high" StandardErrorImportance="high" />
-        <Exec Command="node_modules/.bin/sass .:. --style compressed --load-path=. --update" StandardOutputImportance="high" StandardErrorImportance="high" LogStandardErrorAsError="true" />
-    </Target>
 
 </Project>

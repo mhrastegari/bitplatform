@@ -38,11 +38,10 @@
                 </div>
 
                 <div class="form-input-container">
-                    <BitDatePicker IsResponsive @bind-Value="userToEdit.BirthDate"
-                                   Class="edit-profile-dtp"
+                    <BitDatePicker @bind-Value="userToEdit.BirthDate"
                                    Label="@Localizer[nameof(AppStrings.BirthDate)]"
-                                   GoToTodayTitle="@Localizer[nameof(AppStrings.GoToToday)]"
-                                   Placeholder="@Localizer[nameof(AppStrings.SelectBirthDate)]" />
+                                   Class="edit-profile-dtp"
+                                   Placeholder="@Localizer[nameof(AppStrings.SelectBirthDate)]" GoToToday="@Localizer[nameof(AppStrings.GoToToday)]" />
                     <ValidationMessage For="@(() => userToEdit.BirthDate)" />
                 </div>
 

@@ -1,6 +1,6 @@
 ﻿namespace Boilerplate.Client.Core.Components.Layout;
 
-public partial class Header
+public partial class Header : IDisposable
 {
     private bool disposed;
     private bool isUserAuthenticated;
@@ -11,7 +11,7 @@ public partial class Header
     {
         AuthenticationManager.AuthenticationStateChanged += VerifyUserIsAuthenticatedOrNot;
 
-        isUserAuthenticated = await PrerenderStateService.GetValue(async () => (await AuthenticationStateTask).User.IsAuthenticated());
+        isUserAuthenticated = await PrerenderStateService.GetValue($"{nameof(Header)}-isUserAuthenticated", async () => (await AuthenticationStateTask).User.IsAuthenticated());
 
         await base.OnInitAsync();
     }
@@ -37,11 +37,15 @@ public partial class Header
         await OnToggleMenu.InvokeAsync();
     }
 
-    protected override async ValueTask DisposeAsync(bool disposing)
+    public override void Dispose()
     {
-        await base.DisposeAsync(disposing);
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-        if (disposed || disposing is false) return;
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposed) return;
 
         AuthenticationManager.AuthenticationStateChanged -= VerifyUserIsAuthenticatedOrNot;
 

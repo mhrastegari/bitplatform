@@ -7,5 +7,5 @@ public interface IBitDeviceCoordinator
 {
     public double GetStatusBarHeight() { return 0; }
 
-    public Task ApplyTheme(bool isDark) { return Task.CompletedTask; }
+    public async Task ApplyTheme(bool isDark) { }
 }

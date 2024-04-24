@@ -13,26 +13,10 @@ public partial class BitProgressIndicatorDemo
         },
         new()
         {
-            Name = "Classes",
-            Type = "BitProgressIndicatorClassStyles?",
-            LinkType = LinkType.Link,
-            Href = "#progressIndicator-class-styles",
-            DefaultValue = "null",
-            Description = "Custom CSS classes for different parts of the BitProgressIndicator.",
-        },
-        new()
-        {
-            Name = "BarColor",
-            Type = "string?",
-            DefaultValue = "null",
-            Description = "Color of the BitProgressIndicator.",
-        },
-        new()
-        {
             Name = "BarHeight",
             Type = "int",
             DefaultValue = "2",
-            Description = "Height of the BitProgressIndicator.",
+            Description = "Height of the ProgressIndicator.",
         },
         new()
         {
@@ -60,14 +44,14 @@ public partial class BitProgressIndicatorDemo
             Name = "Label",
             Type = "string",
             DefaultValue = "string.Empty",
-            Description = "Label to display above the BitProgressIndicator.",
+            Description = "Label to display above the component.",
         },
         new()
         {
             Name = "LabelTemplate",
             Type = "RenderFragment?",
             DefaultValue = "null",
-            Description = "Custom label template to display above the BitProgressIndicator.",
+            Description = "Custom label template to display above the component.",
         },
         new()
         {
@@ -82,69 +66,6 @@ public partial class BitProgressIndicatorDemo
             Type = "RenderFragment<BitProgressIndicator>?",
             DefaultValue = "null",
             Description = "A custom template for progress track.",
-        },
-        new()
-        {
-            Name = "Styles",
-            Type = "BitProgressIndicatorClassStyles?",
-            LinkType = LinkType.Link,
-            Href = "#progressIndicator-class-styles",
-            DefaultValue = "null",
-            Description = "Custom CSS Styles for different parts of the BitProgressIndicator.",
-        }
-    };
-
-    private readonly List<ComponentSubClass> componentSubClasses = new()
-    {
-        new()
-        {
-            Id = "progressIndicator-class-styles",
-            Title = "BitProgressIndicatorClassStyles",
-            Parameters = new()
-            {
-               new()
-               {
-                   Name = "Root",
-                   Type = "string?",
-                   DefaultValue = "null",
-                   Description = "Custom CSS classes/styles for the root element of the BitProgressIndicator."
-               },
-               new()
-               {
-                   Name = "LabelContainer",
-                   Type = "string?",
-                   DefaultValue = "null",
-                   Description = "Custom CSS classes/styles for the label container of the BitProgressIndicator."
-               },
-               new()
-               {
-                   Name = "IndicatorWrapper",
-                   Type = "string?",
-                   DefaultValue = "null",
-                   Description = "Custom CSS classes/styles for the indicator wrapper of the BitProgressIndicator."
-               },
-               new()
-               {
-                   Name = "Tracker",
-                   Type = "string?",
-                   DefaultValue = "null",
-                   Description = "Custom CSS classes/styles for the tracker of the BitProgressIndicator."
-               },
-               new()
-               {
-                   Name = "Bar",
-                   Type = "string?",
-                   DefaultValue = "null",
-                   Description = "Custom CSS classes/styles for the bar of the BitProgressIndicator."
-               },
-               new()
-               {
-                   Name = "DescriptionContainer",
-                   Type = "string?",
-                   DefaultValue = "null",
-                   Description = "Custom CSS classes/styles for the description container of the BitProgressIndicator."
-               }
-            }
         }
     };
 

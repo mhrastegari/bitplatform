@@ -83,6 +83,7 @@ public partial class BitCalendar
     private int _currentDay;
     private int _currentYear;
     private int _currentMonth;
+    private bool _isPointerDown;
     private bool _showYearPicker;
     private bool _showTimePicker;
     private bool _showMonthPicker;
@@ -90,10 +91,10 @@ public partial class BitCalendar
     private int _yearPickerEndYear;
     private int _yearPickerStartYear;
     private int? _selectedDateDayOfWeek;
+    private string? _activeDescendantId;
     private string _monthTitle = string.Empty;
     private ElementReference _inputTimeHourRef = default!;
     private ElementReference _inputTimeMinuteRef = default!;
-    private CancellationTokenSource _cancellationTokenSource = new();
     private int[,] _daysOfCurrentMonth = new int[DEFAULT_WEEK_COUNT, DEFAULT_DAY_COUNT_PER_WEEK];
 
     [Inject] private IJSRuntime _js { get; set; } = default!;
@@ -310,16 +311,6 @@ public partial class BitCalendar
     /// </summary>
     [Parameter] public bool ShowTimePickerAsOverlay { get; set; }
 
-    /// <summary>
-    /// Determines increment/decrement steps for calendar's hour.
-    /// </summary>
-    [Parameter] public int HourStep { get; set; } = 1;
-
-    /// <summary>
-    /// Determines increment/decrement steps for calendar's minute.
-    /// </summary>
-    [Parameter] public int MinuteStep { get; set; } = 1;
-
 
     protected override string RootElementClass { get; } = "bit-cal";
 
@@ -327,7 +318,7 @@ public partial class BitCalendar
     {
         ClassBuilder.Register(() => Classes?.Root);
 
-        ClassBuilder.Register(() => (Dir is null && Culture.TextInfo.IsRightToLeft) ? "bit-rtl" : string.Empty);
+        ClassBuilder.Register(() => Culture.TextInfo.IsRightToLeft ? $"{RootElementClass}-rtl" : string.Empty);
     }
 
     protected override void RegisterCssStyles()
@@ -337,6 +328,8 @@ public partial class BitCalendar
 
     protected override void OnInitialized()
     {
+        _activeDescendantId = $"BitCalendar-{UniqueId}-active-descendant";
+
         _showTimePicker = showTimePicker && ShowTimePickerAsOverlay is false;
         _showMonthPicker = _showTimePicker is false && showMonthPicker && ShowMonthPickerAsOverlay is false;
 
@@ -401,14 +394,12 @@ public partial class BitCalendar
         var selectedMonth = FindMonth(weekIndex, dayIndex);
         var isNotInCurrentMonth = IsInCurrentMonth(weekIndex, dayIndex) is false;
 
-        //The number of days displayed in the picker is about 34 days, and if the selected day is less than 15, it means that the next month has been selected in next year.
-        if (selectedMonth < _currentMonth && _currentMonth == 12 && isNotInCurrentMonth && _currentDay < 15)
+        if (selectedMonth < _currentMonth && _currentMonth == 12 && isNotInCurrentMonth)
         {
             _currentYear++;
         }
 
-        //The number of days displayed in the picker is about 34 days, and if the selected day is greater than 15, it means that the previous month has been selected in previous year.
-        if (selectedMonth > _currentMonth && _currentMonth == 1 && isNotInCurrentMonth && _currentDay > 15)
+        if (selectedMonth > _currentMonth && _currentMonth == 1 && isNotInCurrentMonth)
         {
             _currentYear--;
         }
@@ -829,6 +820,21 @@ public partial class BitCalendar
             || (MinDate.HasValue && year < Culture.Calendar.GetYear(MinDate.Value.DateTime));
     }
 
+    private void CheckCurrentCalendarMatchesCurrentValue()
+    {
+        var currentValue = CurrentValue.GetValueOrDefault(DateTimeOffset.Now);
+        var currentValueYear = Culture.Calendar.GetYear(currentValue.DateTime);
+        var currentValueMonth = Culture.Calendar.GetMonth(currentValue.DateTime);
+        var currentValueDay = Culture.Calendar.GetDayOfMonth(currentValue.DateTime);
+
+        if (currentValueYear != _currentYear || currentValueMonth != _currentMonth || currentValueDay != _currentDay)
+        {
+            _currentYear = currentValueYear;
+            _currentMonth = currentValueMonth;
+            GenerateMonthData(_currentYear, _currentMonth);
+        }
+    }
+
     private (string style, string klass) GetDayButtonCss(int day, int week, int todayYear, int todayMonth, int todayDay)
     {
         StringBuilder klass = new StringBuilder();
@@ -972,34 +978,15 @@ public partial class BitCalendar
     {
         if (IsEnabled is false) return;
 
-        ChangeTime(isNext, isHour);
-        ResetCts();
+        _isPointerDown = true;
 
-        var cts = _cancellationTokenSource;
-        await Task.Run(async () =>
-        {
-            await InvokeAsync(async () =>
-            {
-                await Task.Delay(INITIAL_STEP_DELAY);
-                await ContinuousChangeTime(isNext, isHour, cts);
-            });
-        }, cts.Token);
+        await ChangeTime(isNext, isHour, INITIAL_STEP_DELAY);
     }
 
-    private async Task ContinuousChangeTime(bool isNext, bool isHour, CancellationTokenSource cts)
+    private async Task ChangeTime(bool isNext, bool isHour, int stepDelay)
     {
-        if (cts.IsCancellationRequested) return;
+        if (_isPointerDown is false) return;
 
-        ChangeTime(isNext, isHour);
-
-        StateHasChanged();
-
-        await Task.Delay(STEP_DELAY);
-        await ContinuousChangeTime(isNext, isHour, cts);
-    }
-
-    private void ChangeTime(bool isNext, bool isHour)
-    {
         if (isHour)
         {
             ChangeHour(isNext);
@@ -1008,38 +995,41 @@ public partial class BitCalendar
         {
             ChangeMinute(isNext);
         }
+        StateHasChanged();
+
+        await Task.Delay(stepDelay);
+
+        await ChangeTime(isNext, isHour, STEP_DELAY);
     }
 
     private void HandleOnPointerUpOrOut()
     {
-        ResetCts();
-    }
-
-    private void ResetCts()
-    {
-        _cancellationTokenSource.Cancel();
-        _cancellationTokenSource.Dispose();
-        _cancellationTokenSource = new();
+        _isPointerDown = false;
     }
 
     private void ChangeHour(bool isNext)
     {
         if (isNext)
         {
-            _hour += HourStep;
+            if (_hour < 23)
+            {
+                _hour++;
+            }
+            else
+            {
+                _hour = 0;
+            }
         }
         else
         {
-            _hour -= HourStep;
-        }
-
-        if (_hour > 23)
-        {
-            _hour -= 24;
-        }
-        else if (_hour < 0)
-        {
-            _hour += 24;
+            if (_hour > 0)
+            {
+                _hour--;
+            }
+            else
+            {
+                _hour = 23;
+            }
         }
 
         UpdateTime();
@@ -1049,20 +1039,25 @@ public partial class BitCalendar
     {
         if (isNext)
         {
-            _minute += MinuteStep;
+            if (_minute < 59)
+            {
+                _minute++;
+            }
+            else
+            {
+                _minute = 0;
+            }
         }
         else
         {
-            _minute -= MinuteStep;
-        }
-
-        if (_minute > 59)
-        {
-            _minute -= 60;
-        }
-        else if (_minute < 0)
-        {
-            _minute += 60;
+            if (_minute > 0)
+            {
+                _minute--;
+            }
+            else
+            {
+                _minute = 59;
+            }
         }
 
         UpdateTime();
@@ -1102,15 +1097,5 @@ public partial class BitCalendar
                (_showTimePicker && ShowMonthPickerAsOverlay && ShowTimePickerAsOverlay is false) ||
                (_showTimePicker is false && (ShowMonthPickerAsOverlay is false && ShowTimePickerAsOverlay is false) is false);
 
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _cancellationTokenSource.Dispose();
-        }
-
-        base.Dispose(disposing);
     }
 }

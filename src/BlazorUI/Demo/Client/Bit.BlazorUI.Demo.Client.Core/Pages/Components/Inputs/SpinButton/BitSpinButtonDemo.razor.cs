@@ -2,8 +2,8 @@
 
 public partial class BitSpinButtonDemo
 {
-    private readonly List<ComponentParameter> componentParameters =
-    [
+    private readonly List<ComponentParameter> componentParameters = new()
+    {
         new()
         {
             Name = "AriaDescription",
@@ -47,6 +47,12 @@ public partial class BitSpinButtonDemo
             Description = "Custom CSS classes for different parts of the BitSpinButton.",
             LinkType = LinkType.Link,
             Href = "#class-styles",
+        },
+        new()
+        {
+            Name = "ChangeHandler",
+            Type = "EventCallback<BitSpinButtonAction>",
+            Description = "?",
         },
         new()
         {
@@ -128,8 +134,8 @@ public partial class BitSpinButtonDemo
         new()
         {
             Name = "LabelPosition",
-            Type = "BitLabelPosition",
-            DefaultValue = "BitLabelPosition.Top",
+            Type = "BitSpinButtonLabelPosition",
+            DefaultValue = "BitSpinButtonLabelPosition.Top",
             Description = "The position of the label in regards to the spin button.",
             LinkType = LinkType.Link,
             Href = "#labelPosition-enum",
@@ -245,9 +251,10 @@ public partial class BitSpinButtonDemo
             DefaultValue = "\"The {DisplayName ?? FieldIdentifier.FieldName} field is not valid.\"",
             Description = "The message format used for invalid values entered in the input.",
         },
-    ];
-    private readonly List<ComponentSubClass> componentSubClasses =
-    [
+    };
+
+    private readonly List<ComponentSubClass> componentSubClasses = new()
+    {
         new()
         {
             Id = "class-styles",
@@ -348,13 +355,14 @@ public partial class BitSpinButtonDemo
                 }
             }
         }
-    ];
-    private readonly List<ComponentSubEnum> componentSubEnums =
-    [
+    };
+
+    private readonly List<ComponentSubEnum> componentSubEnums = new()
+    {
         new()
         {
             Id = "labelPosition-enum",
-            Name = "BitLabelPosition",
+            Name = "BitSpinButtonLabelPosition",
             Description = "",
             Items = new()
             {
@@ -366,14 +374,14 @@ public partial class BitSpinButtonDemo
                 },
                 new()
                 {
-                    Name= "Start",
-                    Description="The label shows on the start of the spin button.",
+                    Name= "Left",
+                    Description="The label shows on the left side of the spin button.",
                     Value="1",
                 },
                 new()
                 {
-                    Name= "End",
-                    Description="The label shows on the end of the spin button.",
+                    Name= "Right",
+                    Description="The label shows on the right side of the spin button.",
                     Value="2",
                 },
                 new()
@@ -411,22 +419,7 @@ public partial class BitSpinButtonDemo
                 }
             }
         },
-    ];
-    private readonly List<ComponentParameter> componentPublicMembers =
-    [
-        new()
-        {
-            Name = "InputElement",
-            Type = "ElementReference",
-            Description = "The ElementReference to the input element of the BitSpinButton.",
-        },
-        new()
-        {
-            Name = "FocusAsync",
-            Type = "ValueTask",
-            Description = "Gives focus to the input element of the BitSpinButton.",
-        }
-    ];
+    };
 
 
 
@@ -503,9 +496,9 @@ public partial class BitSpinButtonDemo
 
     private readonly string example4RazorCode = @"
 <BitSpinButton Label=""Top (default)"" />
-<BitSpinButton Label=""Start"" LabelPosition=""BitLabelPosition.Start"" />
-<BitSpinButton Label=""End"" LabelPosition=""BitLabelPosition.End"" />
-<BitSpinButton Label=""Bottom"" LabelPosition=""BitLabelPosition.Bottom"" />
+<BitSpinButton Label=""Left Label"" LabelPosition=""BitSpinButtonLabelPosition.Left"" />
+<BitSpinButton Label=""Right Label"" LabelPosition=""BitSpinButtonLabelPosition.Right"" />
+<BitSpinButton Label=""Bottom Label"" LabelPosition=""BitSpinButtonLabelPosition.Bottom"" />
 
 <BitSpinButton>
     <LabelTemplate>

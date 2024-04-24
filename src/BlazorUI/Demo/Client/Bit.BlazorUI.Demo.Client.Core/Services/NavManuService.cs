@@ -2,7 +2,7 @@
 
 public class NavManuService
 {
-    public event Func<Task> OnToggleMenu = default!;
+    public event Func<Task> OnToggleMenu;
 
     public async Task ToggleMenu()
     {

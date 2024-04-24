@@ -11,7 +11,6 @@
      id="@_Id"
      style="@StyleBuilder.Value"
      class="@ClassBuilder.Value"
-     dir="@Dir?.ToString().ToLower()"
      aria-owns="@(IsOpen ? _calloutId : null)">
 
     @if (LabelTemplate is not null)
@@ -41,19 +40,6 @@
          aria-labelledby="@GetDropdownAriaLabelledby"
          aria-controls="@(IsOpen ? _calloutId : null)">
 
-        @if (PrefixTemplate is not null)
-        {
-            @PrefixTemplate
-        }
-        else if (Prefix.HasValue())
-        {
-            <span style="@Styles?.PrefixContainer" class="bit-drp-pre @Classes?.PrefixContainer">
-                <span style="@Styles?.Prefix" class="@Classes?.Prefix">
-                    @Prefix
-                </span>
-            </span>
-        }
-
         <span id="@_dropdownTextContainerId"
               style="@Styles?.TextContainer"
               class="bit-drp-tcn @Classes?.TextContainer"
@@ -61,17 +47,7 @@
               aria-atomic="true"
               aria-invalid="false">
 
-            @if (Chips)
-            {
-                @foreach (var item in _selectedItems)
-                {
-                    <span style="@Styles?.Chips" class="bit-drp-chp @Classes?.Chips">
-                        @GetText(item)
-                        <i style="@Styles?.ChipsRemoveIcon" class="bit-icon bit-icon--Cancel @Classes?.ChipsRemoveIcon" @onclick="() => HandleOnClickUnselectItem(item)" @onclick:stopPropagation />
-                    </span>
-                }
-            }
-            else if (_selectedItems.Count > 0)
+            @if (_text.HasValue())
             {
                 @if (TextTemplate is not null)
                 {
@@ -79,24 +55,10 @@
                 }
                 else
                 {
-                    @GetText()
+                    @_text
                 }
             }
-
-            @if (Combo)
-            {
-                <input @ref="_comboBoxInputRef" @onkeydown="@((k) => HandleOnKeyDown(k))" @oninput="@HandleOnChange"
-                       style="@Styles?.ComboBoxInput"
-                       class="bit-drp-inp @Classes?.ComboBoxInput"
-                       type="text"
-                       role="combobox"
-                       value="@_searchText"
-                       aria-label="@AriaLabel"
-                       placeholder="@(_selectedItems.Count > 0 ? "" : Placeholder)"
-                       autocomplete="@BitAutoCompleteValue.NewPassword"
-                       disabled="@(IsEnabled is false)" />
-            }
-            else if (_selectedItems.Count == 0)
+            else
             {
                 @if (PlaceholderTemplate is not null)
                 {
@@ -109,9 +71,9 @@
             }
         </span>
 
-        @if (IsEnabled && ShowClearButton && _selectedItems.Count > 0)
+        @if (ShowClearButton && SelectedItems.Count > 0 && IsEnabled)
         {
-            <button @onclick="HandleOnClearClick" @onclick:stopPropagation
+            <button @onclick="Clear" @onclick:stopPropagation
                     type="button"
                     style="@Styles?.ClearButton"
                     class="bit-drp-icn bit-drp-clr @Classes?.ClearButton">
@@ -131,19 +93,6 @@
                    class="bit-icon bit-icon--@CaretDownIconName @Classes?.CaretDownIcon" />
             }
         </span>
-
-        @if (SuffixTemplate is not null)
-        {
-            @SuffixTemplate
-        }
-        else if (Suffix.HasValue())
-        {
-            <span style="@Styles?.SuffixContainer" class="bit-drp-suf @Classes?.SuffixContainer">
-                <span style="@Styles?.Suffix" class="@Classes?.Suffix">
-                    @Suffix
-                </span>
-            </span>
-        }
     </div>
 
     <div @onclick="CloseCallout"
@@ -194,7 +143,7 @@
             <div id="@_headerId">@CalloutHeaderTemplate</div>
         }
 
-        @if (ShowSearchBox && Combo is false)
+        @if (ShowSearchBox)
         {
             <div style="@Styles?.SearchBoxContainer"
                  class="@GetSearchBoxClasses() @Classes?.SearchBoxContainer">
@@ -233,30 +182,6 @@
                         </button>
                     </div>
                 }
-            </div>
-        }
-
-        @if (Combo && _isResponsiveMode)
-        {
-            <div style="@Styles?.ResponsiveComboInputContainer"
-                 class="bit-drp-cbi @Classes?.ResponsiveComboInputContainer">
-                <input @ref="_comboBoxInputResponsiveRef" @onkeydown="@((k) => HandleOnKeyDown(k))" @oninput="@HandleOnChange"
-                       style="@Styles?.ComboBoxInput"
-                       class="bit-drp-icb @Classes?.ComboBoxInput"
-                       type="text"
-                       role="combobox"
-                       value="@_searchText"
-                       aria-label="@AriaLabel"
-                       placeholder="@Placeholder"
-                       autocomplete="@BitAutoCompleteValue.NewPassword"
-                       disabled="@(IsEnabled is false)" />
-
-                <button @onclick="HandleOnAddItemComboClick" @onclick:stopPropagation
-                        type="button"
-                        style="@Styles?.ResponsiveComboAddButton"
-                        class="bit-drp-icn bit-drp-cai @Classes?.ResponsiveComboAddButton">
-                    <i class="bit-icon bit-icon--Add" />
-                </button>
             </div>
         }
 
@@ -303,7 +228,7 @@
     </div>
 
     <select @attributes="InputHtmlAttributes" class="bit-input-hidden" multiple>
-        @foreach (var item in _selectedItems)
+        @foreach (var item in SelectedItems)
         {
             <option value="@GetValue(item)" selected>@GetText(item)</option>
         }

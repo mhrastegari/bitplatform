@@ -1,15 +1,5 @@
 {
     "profiles": {
-        "Boilerplate.Server": {
-            "commandName": "Project",
-            "launchBrowser": true,
-            "environmentVariables": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "dotnetRunMessages": true,
-            "applicationUrl": "http://localhost:5030"
-        },
-        //#if (api == true)
         "Boilerplate.Server-Swagger": {
             "commandName": "Project",
             "launchBrowser": true,
@@ -20,7 +10,6 @@
             "dotnetRunMessages": true,
             "applicationUrl": "http://localhost:5030"
         },
-        //#endif
         "Boilerplate.Server-BlazorWebAssembly": {
             "commandName": "Project",
             "launchBrowser": true,
@@ -34,7 +23,7 @@
         "WSL": {
             "commandName": "WSL2",
             "launchBrowser": true,
-            "launchUrl": "http://localhost:5030/",
+            "launchUrl": "http://localhost:5030/swagger",
             "environmentVariables": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
                 "ASPNETCORE_URLS": "http://localhost:5030"
@@ -43,7 +32,7 @@
         "Docker": {
             "commandName": "SdkContainer",
             "launchBrowser": true,
-            "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/",
+            "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
             "environmentVariables": {
                 "ASPNETCORE_HTTP_PORTS": "5030"
             },

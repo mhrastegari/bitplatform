@@ -1,5 +1,4 @@
-﻿//+:cnd:noEmit
-using Boilerplate.Shared.Dtos.Identity;
+﻿using Boilerplate.Shared.Dtos.Identity;
 
 namespace Boilerplate.Client.Core.Components.Pages.Identity;
 

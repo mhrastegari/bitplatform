@@ -9,12 +9,11 @@ variables:
   ConnectionStrings.SqlServerConnectionString: $(DB_CONNECTION_STRING)
   AppSettings.IdentitySettings.IdentityCertificatePassword: $(API_IDENTITY_CERTIFICATE_PASSWORD)
   ApiServerAddress: 'https://bp.bitplatform.dev/'
-  WindowsUpdateSettings.FilesUrl: 'https://windows-boilerplate.bitplatform.dev'
 
 jobs:
 
 - job: build_api_blazor
-  displayName: 'build api + blazor web'
+  displayName: 'build api + blazor'
 
   pool:
     vmImage: 'ubuntu-22.04'
@@ -26,9 +25,9 @@ jobs:
       useGlobalJson: true
       workingDirectory: 'src'
 
-  - task: NodeTool@1
+  - task: NodeTool@0
     inputs:
-      versionSpec: '20.x'
+      versionSpec: '18.x'
     displayName: 'Install Node.js'
 
   # - task: Bash@3
@@ -45,7 +44,7 @@ jobs:
       script: |
           'cd src && dotnet workload install wasm-tools wasm-experimental'
 
-  - task: FileTransform@2
+  - task: FileTransform@1
     displayName: Update appsettings.json
     inputs:
       fileType: 'json'
@@ -105,7 +104,7 @@ jobs:
       artifact: 'migrations-bundle'
       path: ./
 
-  - task: FileTransform@2
+  - task: FileTransform@1
     displayName: Update appsettings.json
     inputs:
       fileType: 'json'
@@ -143,10 +142,8 @@ jobs:
       WebAppName: '$(APP_SERVICE_NAME)'
       packageForLinux: '.'
 
-#if (windows == true)
 - job: build_blazor_hybrid_windows
   displayName: 'build blazor hybrid (windows)'
-#endif
 
   pool:
     vmImage: 'windows-2022'
@@ -158,17 +155,23 @@ jobs:
       useGlobalJson: true
       workingDirectory: 'src'
 
-  - task: NodeTool@1
+  - task: NodeTool@0
     inputs:
-      versionSpec: '20.x'
+      versionSpec: '18.x'
     displayName: 'Install Node.js'
 
-  - task: FileTransform@2
+  - task: FileTransform@1
     displayName: Update appsettings.json
     inputs:
       fileType: 'json'
       folderPath: './'
       targetFiles: 'src/Client/Boilerplate.Client.Core/appsettings.json'
+
+  - task: Bash@3
+    displayName: 'Install maui'
+    inputs:
+      targetType: 'inline'
+      script: cd src && dotnet workload install maui
 
   - task: Bash@3
     displayName: 'Generate CSS/JS files'
@@ -177,30 +180,15 @@ jobs:
       script: 'dotnet build src/Client/Boilerplate.Client.Core/Boilerplate.Client.Core.csproj -t:BeforeBuildTasks --no-restore'
 
   - task: Bash@3
-    displayName: 'Publish'
+    displayName: 'Build exe'
     inputs:
       targetType: 'inline'
-      script: |
-        cd src\Client\Boilerplate.Client.Windows\
-        dotnet publish Boilerplate.Client.Windows.csproj -c Release -o .\bin\publish-arm64 -r win-arm64
-        ren .\bin\publish-arm64\Boilerplate.Client.Windows.exe Boilerplate.Client.Windows-arm64.exe
-        dotnet publish Boilerplate.Client.Windows.csproj -c Release -o .\bin\publish-x86 -r win-x86
-        ren .\bin\publish-x86\Boilerplate.Client.Windows.exe Boilerplate.Client.Windows-x86.exe
-        dotnet publish Boilerplate.Client.Windows.csproj -c Release -o .\bin\publish-x64 -r win-x64
-        ren .\bin\publish-x64\Boilerplate.Client.Windows.exe Boilerplate.Client.Windows-x64.exe
-        dotnet publish Boilerplate.Client.Windows.csproj -c Release -o .\bin\publish
-        del .\bin\publish\Boilerplate.Client.Windows.exe
-        echo D | xcopy .\bin\publish-arm64 .\publish-result /s /e /h
-        echo A | xcopy .\bin\publish-x86 .\publish-result /s /e /h
-        echo A | xcopy .\bin\publish-x64 .\publish-result /s /e /h
-        echo A | xcopy .\bin\publish .\publish-result /s /e /h
-        dotnet tool restore
-        dotnet vpk pack -u Boilerplate.Client.Windows -v "${{ vars.APPLICATION_DISPLAY_VERSION }}" -p .\publish-result -e Boilerplate.Client.Windows-x86.exe -r win-x86 --framework net8.0.4-x86-desktop,webview2 --icon .\wwwroot\favicon.ico --packTitle 'Boilerplate'
+      script: 'dotnet build src/Client/Boilerplate.Client.Maui/Boilerplate.Client.Maui.csproj -c Release -p:WindowsPackageType=None -p:SelfContained=true -p:WindowsAppSDKSelfContained=true -p:GenerateAppxPackageOnBuild=false -p:RuntimeIdentifier=win10-x86 -p:UseRidGraph=true -f net8.0-windows10.0.19041.0'
 
   - task: PublishPipelineArtifact@1
     displayName: Upload artifact
     inputs:
-      targetPath: 'src\Client\Boilerplate.Client.Windows\Releases'
+      targetPath: 'src/Client/Boilerplate.Client.Maui/bin/release/net8.0-windows10.0.19041.0/win10-x86'
       artifact: 'win-exe-bundle'
       publishLocation: 'pipeline'
 
@@ -217,9 +205,9 @@ jobs:
       useGlobalJson: true
       workingDirectory: 'src'
 
-  - task: NodeTool@1
+  - task: NodeTool@0
     inputs:
-      versionSpec: '20.x'
+      versionSpec: '18.x'
     displayName: 'Install Node.js'
 
   - task: Bash@3
@@ -229,10 +217,10 @@ jobs:
       script: cd src && dotnet workload install maui-android
 
   - task: Bash@3
-    displayName: 'Install Android Sdk platform tools'
+    displayName: 'Install Android Dependencies'
     inputs:
       targetType: 'inline'
-      script: '${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools"'
+      script: 'dotnet build src/Client/Boilerplate.Client.Maui/Boilerplate.Client.Maui.csproj -t:InstallAndroidDependencies -f:net8.0-android -p:AcceptAndroidSDKLicenses=True -p:AndroidSdkPath="/usr/local/lib/android/sdk/"'
 
   - task: DownloadSecureFile@1
     displayName: Download Boilerplate keystore file
@@ -245,18 +233,18 @@ jobs:
     failOnStderr: true
     displayName: Copy keystore to app project folder
 
-  - task: FileTransform@2
+  - task: FileTransform@1
     displayName: Update appsettings.json
     inputs:
       fileType: 'json'
       folderPath: './'
       targetFiles: 'src/Client/Boilerplate.Client.Core/appsettings.json'
   
-  - script: |
-      dotnet build src/Client/Boilerplate.Client.Core/Boilerplate.Client.Core.csproj -t:BeforeBuildTasks --no-restore
-      dotnet build src/Client/Boilerplate.Client.Maui/Boilerplate.Client.Maui.csproj -t:BeforeBuildTasks --no-restore
-    failOnStderr: true
-    displayName: Generate CSS/JS files
+  - task: Bash@3
+    displayName: 'Generate CSS/JS files'
+    inputs:
+      targetType: 'inline'
+      script: 'dotnet build src/Client/Boilerplate.Client.Core/Boilerplate.Client.Core.csproj -t:BeforeBuildTasks --no-restore'
 
   - task: Bash@3
     displayName: 'Build aab'
@@ -281,4 +269,60 @@ jobs:
     inputs:
       targetPath: 'drop/'
       artifact: 'android-bundle'
+      publishLocation: 'pipeline'
+
+- job: build_blazor_hybrid_maccatalyst
+  displayName: 'build blazor hybrid (maccatalyst)'
+
+  pool:
+    vmImage: 'macos-13'
+
+  steps:
+  - task: UseDotNet@2
+    displayName: 'Setup .NET'
+    inputs:
+      useGlobalJson: true
+      workingDirectory: 'src'
+
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '18.x'
+    displayName: 'Install Node.js'
+
+  - task: FileTransform@1
+    displayName: Update appsettings.json
+    inputs:
+      fileType: 'json'
+      folderPath: './'
+      targetFiles: 'src/Client/Boilerplate.Client.Core/appsettings.json'
+
+  - task: Bash@3
+    displayName: 'Install maui'
+    inputs:
+      targetType: 'inline'
+      script: cd src && dotnet workload install maui
+
+  - task: Bash@3
+    displayName: 'Generate CSS/JS files'
+    inputs:
+      targetType: 'inline'
+      script: 'dotnet build src/Client/Boilerplate.Client.Core/Boilerplate.Client.Core.csproj -t:BeforeBuildTasks --no-restore'
+
+  - task: Bash@3
+    displayName: 'Build pkg'
+    inputs:
+      targetType: 'inline'
+      script: 'dotnet build src/Client/Boilerplate.Client.Maui/Boilerplate.Client.Maui.csproj -c Release -p:CreatePackage=true -f net8.0-maccatalyst'
+
+  - script: |
+      mkdir drop
+      cp ./src/Client/Boilerplate.Client.Maui/bin/Release/net8.0-maccatalyst/*.pkg drop/
+    failOnStderr: true
+    displayName: Copy pkg file to drop folder
+
+  - task: PublishPipelineArtifact@1
+    displayName: Upload artifact
+    inputs:
+      targetPath: 'drop/'
+      artifact: 'mac-pkg-bundle'
       publishLocation: 'pipeline'

@@ -220,28 +220,14 @@
                  </BitDialog>
              </div>
          </ExamplePreview>
-    </ComponentExampleBox>
-
-    <ComponentExampleBox Title="RTL" RazorCode="@example8RazorCode" CsharpCode="@example8CsharpCode" Id="example8">
-        <ExamplePreview>
-            <div>
-                <BitButton Dir="BitDir.Rtl" OnClick="@(() => IsOpen10 = true)">باز کردن پنجره پیام</BitButton>
-                <BitDialog @bind-IsOpen="IsOpen10" 
-                           Dir="BitDir.Rtl"
-                           Title="بدون موضوع"
-                           OkText="تایید"
-                           CancelText="انصراف"
-                           Message="آیا می خواهید این پیام را بدون موضوع ارسال کنید؟" />
-            </div>
-        </ExamplePreview>
-    </ComponentExampleBox>
+     </ComponentExampleBox>
  </ComponentDemo>
 
  @code {
     private bool IsOpen = false;
 
-    private BitDialog dialogRef = default!;
-    private BitDialog customDialogRef = default!;
+    private BitDialog dialogRef;
+    private BitDialog customDialogRef;
 
     private bool IsOpen1 = false;
 
@@ -261,8 +247,6 @@
     private bool IsDraggable = false;
     private bool IsOpen8 = false;
     private bool IsOpen9 = false;
-
-    private bool IsOpen10 = false;
 
     private void OpenDialogInPosition(BitDialogPosition positionValue)
     {

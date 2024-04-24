@@ -1,5 +1,5 @@
 ﻿@page "/history"
-@implements IAsyncDisposable
+@implements IDisposable
 @inject Bit.Butil.Console console
 @inject Bit.Butil.History history
 
@@ -7,7 +7,7 @@
 
 <h1>History</h1>
 
-<pre style="font-family:Consolas; overflow: auto;">
+<pre style="font-family:Consolas">
 @@inject Bit.Butil.History history
 
 @@code {
@@ -20,75 +20,32 @@
 <br />
 <hr />
 
-<h3>Open the DevTools console and start clicking on buttons</h3>
+<h4>Open the DevTools and start clicking on buttons</h4>
 
 <hr />
 <br />
 
+<button @onclick="GetLength">Get length</button>
+<br />
 <button @onclick="GoBack">&lt; Back</button>
-&nbsp;
+<br />
 <button @onclick="GoForward">Forward &gt;</button>
-<br />
-<br />
-<button @onclick="() => Go(-1)">Go (-1)</button>
-&nbsp;
-<button @onclick="() => Go(0)">Go (0)</button>
-&nbsp;
-<button @onclick="() => Go(1)">Go (1)</button>
-
-<br />
-<br />
-<hr />
-<br />
-
-<button @onclick="GetLength">GetLength</button>
-
-<br />
-<br />
-<hr />
-<br />
-
-<input type="checkbox" @bind="@isScrollRestorationManual" />
-<label>@(isScrollRestorationManual ? "Manual" : "Auto")</label>
-<br />
-<br />
-<button @onclick=SetScrollRestoration>SetScrollRestoration</button>
-<br />
-<br />
-<button @onclick=GetScrollRestoration>GetScrollRestoration</button>
-
-<br />
-<br />
-<hr />
-<br />
-
-<button @onclick="GetState">GetState</button>
-
-<br />
-<br />
-<hr />
-<br />
-
-<button @onclick="PushState">PushState</button>
-&nbsp;
-<button @onclick="ReplaceState">ReplaceState</button>
-
-<br />
-<br />
 
 @code {
-    private bool isScrollRestorationManual;
-
     protected override async Task OnInitializedAsync()
     {
-        await history.AddPopState(obj => _ = console.Log("Popped state:", obj));
+        // await history.PushState(new { Name = "Saleh1" }, "#1");
+        // await history.PushState(new { Name = "Saleh2" }, "#2");
+
+        await history.AddPopState(o => _ = console.Log("Popped state:", o));
 
         await base.OnInitializedAsync();
     }
 
-    private async Task Go(int delta)
+    private async Task GetLength()
     {
-        await history.Go(delta);
+        var length = await history.GetLength();
+        await console.Log("History length", length);
     }
 
     private async Task GoBack()
@@ -101,40 +58,8 @@
         await history.GoForward();
     }
 
-    private async Task GetLength()
+    public void Dispose()
     {
-        var length = await history.GetLength();
-        await console.Log("History length", length);
-    }
-
-    private async Task SetScrollRestoration()
-    {
-        await history.SetScrollRestoration(isScrollRestorationManual ? ScrollRestoration.Manual : ScrollRestoration.Auto);
-    }
-
-    private async Task GetScrollRestoration()
-    {
-        await console.Log("history.scrollRestoration =", await history.GetScrollRestoration());
-    }
-
-    private async Task GetState()
-    {
-        var state = await history.GetState();
-        await console.Log("History state", state);
-    }
-
-    private async Task PushState()
-    {
-        await history.PushState(url: "/window");
-    }
-
-    private async Task ReplaceState()
-    {
-        await history.ReplaceState(url: "/document");
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await history.DisposeAsync();
+        history.Dispose();
     }
 }
