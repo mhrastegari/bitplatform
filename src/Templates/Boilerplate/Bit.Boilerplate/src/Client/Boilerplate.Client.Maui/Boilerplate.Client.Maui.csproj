@@ -30,6 +30,7 @@
 
     <PropertyGroup Condition="'$(TargetFramework)|$(Platform)'=='net8.0-maccatalyst|AnyCPU'">
       <MtouchLink>None</MtouchLink>
+      <PublishTrimmed>false</PublishTrimmed>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-android')) and '$(Configuration)' == 'Release'">
