@@ -47,6 +47,7 @@ jobs:
          files: 'AdminPanel/src/Client/AdminPanel.Client.Core/appsettings.json'
        env:
          ApiServerAddress: ${{ env.API_SERVER_ADDRESS }}
+         ApplicationInsights.ConnectionString: ""
 
      - name: Install maui
        run: cd src && dotnet workload install maui
