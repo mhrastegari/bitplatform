@@ -25,6 +25,10 @@
         <!-- Required for C# Hot Reload -->
         <UseInterpreter>True</UseInterpreter>
 
+        <PropertyGroup Condition="'$(TargetFramework)|$(Platform)'=='net8.0-maccatalyst|AnyCPU'">
+          <MtouchLink>None</MtouchLink>
+        </PropertyGroup>
+
         <NoWarn>$(NoWarn);ClassWithoutModifierAnalyzer</NoWarn>
     </PropertyGroup>
 
