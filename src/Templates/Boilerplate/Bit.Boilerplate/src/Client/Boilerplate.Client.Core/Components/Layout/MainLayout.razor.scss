@@ -23,6 +23,7 @@ main {
     flex-grow: 1;
     display: flex;
     padding: 2rem;
+    overflow: auto;
     min-height: 100%;
     flex-flow: column;
     height: fit-content;

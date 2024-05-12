@@ -1,9 +1,8 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="status-bar">Boilerplate</div>
-
 <CascadingValue Value="currentDir">
     <div dir="@currentDir?.ToString()" class="layout">
+        <div class="status-bar">Boilerplate</div>
         <Header OnToggleMenu=ToggleMenuHandler />
 
         <main class="@BitCss.Class.Color.Background.Primary">

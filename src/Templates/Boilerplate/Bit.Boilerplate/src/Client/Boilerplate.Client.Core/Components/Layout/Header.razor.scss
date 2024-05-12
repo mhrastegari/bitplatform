@@ -7,27 +7,23 @@
     top: 0;
     width: 100%;
     display: flex;
-    align-items: center;
+    align-items: end;
     flex-flow: row nowrap;
-    min-height: rem2(48px);
-    padding-bottom: rem2(7px);
+    padding-block: rem2(7px);
     padding-inline: rem2(16px);
     justify-content: space-between;
     box-shadow: $bit-box-shadow-callout;
     background-color: $bit-color-background-primary;
-    padding-top: calc(rem2(7px) + var(--bit-status-bar-height));
-}
+    min-height: calc(rem2(48px) + var(--bit-status-bar-height));
 
-.bit-ios {
-    .header {
-        padding-top: calc(rem2(7px) + env(safe-area-inset-top));
+    .bit-ios & {
+        min-height: calc(rem2(48px) + env(safe-area-inset-top));
     }
 }
 
 .logo-lnk {
     cursor: pointer;
-    width: rem2(24px);
-    height: rem2(24px);
+    height: rem2(32px);
     min-width: rem2(24px);
     border-radius: rem2(4px);
     background-size: contain;
